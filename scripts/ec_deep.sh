@@ -44,3 +44,5 @@ echo "" >> "$OUTPUT"
 echo "---" >> "$OUTPUT"
 echo "生成完了：$(date)" >> "$OUTPUT"
 echo "✅ 全6本完了：$OUTPUT"
+
+cd $HOME/sen-board && git add . && git commit -m "auto: $(date +%Y-%m-%d) EC戦略リサーチ" && git push origin main

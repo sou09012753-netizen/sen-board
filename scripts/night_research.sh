@@ -1,39 +1,47 @@
 #!/bin/bash
+export PATH="/Users/sou/.nvm/versions/node/v24.16.0/bin:$PATH"
 DATE=$(date +%Y-%m-%d)
 OUTPUT="$HOME/sen-board/logs/${DATE}.md"
-AGENTS_DIR="$HOME/sen-board/agents"
+CONTEXT=$(find "$HOME/sen-board/agents" -name "*.md" | xargs cat 2>/dev/null)
 
-echo "# SEN 夜間リサーチ — ${DATE}" > $OUTPUT
-echo "" >> $OUTPUT
+echo "# SEN 夜間リサーチ — ${DATE}" > "$OUTPUT"
+echo "" >> "$OUTPUT"
 
-CONTEXT=$(find $AGENTS_DIR -name "*.md" | xargs cat 2>/dev/null)
+BASE="あなたはSEN社の経営会議AIチームです。以下のコンテキストを踏まえて深く分析せよ。甘い分析は禁止。否定AIに穴を叩かせ、統合AIが対策まで出す。
 
-claude --print "
-あなたはSEN社の経営会議AIチームです。以下の4テーマを順番に分析してください。
-
-【会社コンテキスト — agents フォルダより】
+【会社コンテキスト】
 ${CONTEXT}
 
-【分析の4テーマ】
-1. コーチング事業（79万商品・ターゲット再定義・差別化）
-2. 農業EC（10億ゴール・インターン主導・差別化戦略）
-3. SENアプリ完成度（自己分析コーチングSaaS・競合比較・次の一手）
-4. note自動化（X→note収益パイプライン・期待値・実装優先度）
+【前提】
+- ランウェイ1.4ヶ月・借金290万・今月のコーチング成約が全ての前提
+- スケ：今月営業+コーチング、来月からコーチング専任
+- 農業EC：さとな・なのかがインターン主導で進行中（仙石は関与しない）
+- SENアプリ：Vercel稼働中・クライアント検証フェーズ
+- EC事業：産直ドロップシッピング設計中・7月頭撮影ゴール"
 
-【各テーマで出すこと】
-- 世界水準の専門家視点でのリサーチ（競合・市場・トレンド）
-- 差別化ポイント（なぜSENが勝てるか）
-- 期待値（3ヶ月・1年・3年の数値感）
-- 今週やるべき一手
+run() {
+  echo "" >> "$OUTPUT"
+  echo "---" >> "$OUTPUT"
+  echo "## $1" >> "$OUTPUT"
+  echo "" >> "$OUTPUT"
+  claude --print "$BASE
 
-【AIロール設定】
-- コーチング分析：Marshall Goldsmith × ICFマスターコーチ
-- 農業EC分析：孫正義 × Amazonアグリ戦略部門
-- アプリ分析：Paul Graham × Steve Jobs
-- note自動化：Gary Vaynerchuk × SEO神田昌典
-" >> $OUTPUT
+【今回の論点】
+$2" >> "$OUTPUT"
+  echo "[$(date +%H:%M)] $1 完了"
+}
 
-echo "" >> $OUTPUT
-echo "---" >> $OUTPUT
-echo "生成時刻：$(date)" >> $OUTPUT
-echo "完了：$OUTPUT"
+run "1. SENアプリ" "現在の完成度と次に実装すべき機能の優先順位。りくくん・さとな・まえはらのフィードバック取得状況。SESSION 0実装の是非。今週の一手。"
+
+run "2. EC戦略" "産直ドロップシッピングECの進捗確認。さとなのテンプレート記入状況。農家を口説くロジックの精度。7月撮影までの残タスク。今週の一手。"
+
+run "3. スケの営業進捗" "今月10件目標に対するパイプライン状況。2回目クロージング対象の状況。DM数・商談数の進捗。詰まってる箇所と対策。今週の一手。"
+
+run "4. チーム状況" "さとな・なのか・スケそれぞれの動き・リスク・次の関与タイミング。仙石が今週やるべき承認・判断はあるか。チームへの一手。"
+
+echo "" >> "$OUTPUT"
+echo "---" >> "$OUTPUT"
+echo "生成完了：$(date)" >> "$OUTPUT"
+
+cd "$HOME/sen-board" && git add . && git commit -m "auto: ${DATE} 夜間リサーチ" && git push origin main
+echo "✅ 完了・GitHub push済み：$OUTPUT"
