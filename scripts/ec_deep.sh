@@ -1,5 +1,15 @@
 #!/bin/bash
 export PATH="/Users/sou/.nvm/versions/node/v24.16.0/bin:$PATH"
+
+if [ -f "$HOME/.sen-board.env" ]; then
+  source "$HOME/.sen-board.env"
+fi
+
+if [ -z "$ANTHROPIC_API_KEY" ]; then
+  echo "[ERROR] ANTHROPIC_API_KEY が未設定です" >&2
+  exit 1
+fi
+
 DATE=$(date +%Y-%m-%d)
 OUTPUT="$HOME/sen-board/logs/${DATE}_EC戦略.md"
 AGENTS=$(find "$HOME/sen-board/agents" -name "*.md" | xargs cat 2>/dev/null)
@@ -21,12 +31,33 @@ ${AGENTS}
 
 甘い分析は禁止。否定AIに徹底的に穴を叩かせ、統合AIが対策まで出す。数字は調査して根拠を示す。"
 
+ask_claude() {
+  local prompt="$1"
+  local body
+  body=$(python3 -c "
+import json, sys
+prompt = sys.stdin.read()
+print(json.dumps({
+  'model': 'claude-opus-4-8',
+  'max_tokens': 2000,
+  'messages': [{'role': 'user', 'content': prompt}]
+}))
+" <<< "$prompt")
+
+  curl -s https://api.anthropic.com/v1/messages \
+    -H "x-api-key: $ANTHROPIC_API_KEY" \
+    -H "anthropic-version: 2023-06-01" \
+    -H "content-type: application/json" \
+    -d "$body" \
+    | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['content'][0]['text'] if 'content' in d else d.get('error',{}).get('message','APIエラー'))"
+}
+
 run() {
   echo "" >> "$OUTPUT"
   echo "---" >> "$OUTPUT"
   echo "## $1" >> "$OUTPUT"
   echo "" >> "$OUTPUT"
-  claude --print "$BASE
+  ask_claude "$BASE
 
 【今回の論点】
 $2" >> "$OUTPUT"
