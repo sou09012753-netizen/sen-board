@@ -12,7 +12,9 @@ if [ -z "$ANTHROPIC_API_KEY" ]; then
 fi
 
 DATE=$(date +%Y-%m-%d)
-OUTPUT="$HOME/sen-board/logs/${DATE}.md"
+MONTH=$(date +%Y-%m)
+mkdir -p "$HOME/sen-board/logs/${MONTH}"
+OUTPUT="$HOME/sen-board/logs/${MONTH}/${DATE}_夜間リサーチ.md"
 CONTEXT=$(find "$HOME/sen-board/agents" -name "*.md" | xargs cat 2>/dev/null)
 
 echo "# SEN 夜間リサーチ — ${DATE}" > "$OUTPUT"
