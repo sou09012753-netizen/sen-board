@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEN — セッションを、一段深くする。</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* ── THEME ── */
+    [data-theme="dark"] {
+      --bg:     #060606;
+      --bg2:    #0d0d0d;
+      --bg3:    #111;
+      --bd:     rgba(255,255,255,0.08);
+      --bd2:    rgba(255,255,255,0.04);
+      --text:   #e4e4e4;
+      --muted:  #555;
+      --dim:    #2a2a2a;
+      --white:  #ffffff;
+      --card:   #0c0c0c;
+      --nav:    rgba(6,6,6,0.88);
+      --icon-bg:#111;
+    }
+    [data-theme="light"] {
+      --bg:     #f8f8f6;
+      --bg2:    #f0f0ee;
+      --bg3:    #e8e8e6;
+      --bd:     rgba(0,0,0,0.09);
+      --bd2:    rgba(0,0,0,0.05);
+      --text:   #1a1a1a;
+      --muted:  #777;
+      --dim:    #ccc;
+      --white:  #0a0a0a;
+      --card:   #ffffff;
+      --nav:    rgba(248,248,246,0.88);
+      --icon-bg:#f0f0ee;
+    }
+    :root { --g: #c8f464; }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      transition: background .35s, color .35s;
+      overflow-x: hidden;
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.in { opacity: 1; transform: none; }
+    .reveal-d1 { transition-delay: .1s; }
+    .reveal-d2 { transition-delay: .2s; }
+    .reveal-d3 { transition-delay: .3s; }
+    .reveal-d4 { transition-delay: .4s; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+      height: 54px; padding: 0 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--nav); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--bd2);
+      transition: background .35s;
+    }
+    .nl { display: flex; align-items: center; gap: 12px; }
+    .logo { font-size: 15px; font-weight: 900; letter-spacing: .18em; color: var(--g); }
+    .for { font-size: 10px; color: var(--muted); letter-spacing: .1em; }
+    .nr { display: flex; align-items: center; gap: 10px; }
+    .toggle-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1px solid var(--bd); background: var(--bg2);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; transition: background .35s;
+    }
+    .nav-cta {
+      font-size: 12px; font-weight: 800; letter-spacing: .04em;
+      color: #000; background: var(--g);
+      padding: 8px 16px; border-radius: 40px;
+      text-decoration: none; white-space: nowrap;
+    }
+    .nav-ig {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 11px; color: var(--muted); text-decoration: none;
+    }
+    .nav-ig svg { width: 13px; height: 13px; fill: var(--muted); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100svh;
+      padding: 120px 24px 80px;
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    [data-theme="dark"] .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 30% 50%, rgba(200,244,100,.055) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 10px; font-weight: 700; letter-spacing: .22em; color: var(--g);
+      text-transform: uppercase; margin-bottom: 28px;
+      animation: fadeUp .8s cubic-bezier(.22,1,.36,1) both;
+    }
+    .dot-pulse {
+      width: 7px; height: 7px; background: var(--g); border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.6)} }
+    .hero h1 {
+      font-size: clamp(36px, 10vw, 64px);
+      font-weight: 900; line-height: 1.15; letter-spacing: -.035em;
+      color: var(--white); margin-bottom: 24px;
+      animation: fadeUp .8s .1s cubic-bezier(.22,1,.36,1) both;
+    }
+    .hero h1 em { font-style: normal; color: var(--g); }
+    .hero h1 .soft { color: var(--muted); }
+    .hero-sub {
+      font-size: 14px; color: var(--muted); line-height: 1.9;
+      max-width: 300px; margin-bottom: 44px;
+      animation: fadeUp .8s .2s cubic-bezier(.22,1,.36,1) both;
+    }
+    .hero-ctas {
+      display: flex; flex-direction: column; gap: 10px; max-width: 260px;
+      animation: fadeUp .8s .3s cubic-bezier(.22,1,.36,1) both;
+    }
+    .btn-g {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--g); color: #000;
+      font-size: 14px; font-weight: 800; letter-spacing: .03em;
+      padding: 16px 24px; border-radius: 14px; text-decoration: none;
+    }
+    .btn-outline {
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--bd); color: var(--muted);
+      font-size: 12px; padding: 13px 24px; border-radius: 14px; text-decoration: none;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ── STATS BAR ── */
+    .stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+      background: var(--bd2);
+      border-top: 1px solid var(--bd2); border-bottom: 1px solid var(--bd2);
+    }
+    .stat {
+      padding: 28px 20px; background: var(--bg2);
+      transition: background .35s;
+    }
+    .stat-n {
+      font-size: 32px; font-weight: 900; letter-spacing: -.03em;
+      color: var(--white); line-height: 1; margin-bottom: 6px;
+    }
+    .stat-n span { font-size: 17px; color: var(--g); margin-left: 2px; }
+    .stat-l { font-size: 10px; color: var(--dim); letter-spacing: .05em; line-height: 1.5; }
+
+    /* ── SECTION BASE ── */
+    .section { padding: 80px 24px; border-top: 1px solid var(--bd2); }
+    .eyebrow {
+      font-size: 10px; font-weight: 700; letter-spacing: .2em;
+      text-transform: uppercase; color: var(--g); margin-bottom: 16px;
+    }
+    .sh2 {
+      font-size: clamp(24px, 7vw, 38px); font-weight: 900;
+      letter-spacing: -.03em; line-height: 1.2; color: var(--white);
+      margin-bottom: 10px;
+    }
+    .sh2 em { font-style: normal; color: var(--g); }
+    .slead { font-size: 13px; color: var(--muted); line-height: 1.9; max-width: 300px; margin-bottom: 40px; }
+
+    /* ── PAIN ICONS ── */
+    .pain-grid { display: flex; flex-direction: column; gap: 3px; }
+    .pain-item {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 22px 18px;
+      background: var(--card); border: 1px solid var(--bd); border-radius: 16px;
+      transition: background .35s;
+    }
+    .pain-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--icon-bg); border: 1px solid var(--bd2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+      transition: background .35s;
+    }
+    .pain-txt h3 { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 5px; }
+    .pain-txt p  { font-size: 12px; color: var(--muted); line-height: 1.8; }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow-nodes { display: flex; flex-direction: column; gap: 0; }
+    .flow-node {
+      display: flex; gap: 20px; align-items: flex-start;
+      padding: 28px 0; position: relative;
+    }
+    .flow-node:not(:last-child)::after {
+      content: '';
+      position: absolute; left: 19px; bottom: 0;
+      width: 2px; height: 28px;
+      background: linear-gradient(to bottom, var(--bd), transparent);
+    }
+    .flow-circle {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      border: 2px solid var(--bd);
+      background: var(--card);
+      transition: background .35s;
+    }
+    .flow-node.hi .flow-circle {
+      border-color: rgba(200,244,100,.4);
+      background: rgba(200,244,100,.07);
+    }
+    .flow-content h3 { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 5px; }
+    .flow-content p  { font-size: 12px; color: var(--muted); line-height: 1.8; }
+    .flow-tag {
+      display: inline-block; margin-top: 9px;
+      font-size: 10px; font-weight: 700; letter-spacing: .1em;
+      color: #000; background: var(--g); padding: 4px 10px; border-radius: 20px;
+    }
+
+    /* ── TIME CHART ── */
+    .chart-wrap {
+      background: var(--card); border: 1px solid var(--bd);
+      border-radius: 20px; padding: 28px 22px;
+      transition: background .35s;
+    }
+    .chart-title { font-size: 12px; color: var(--muted); margin-bottom: 24px; }
+    .chart-title strong { color: var(--white); font-size: 14px; display: block; margin-bottom: 4px; }
+    .chart-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+    .chart-row:last-of-type { margin-bottom: 0; }
+    .chart-label { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; }
+    .chart-label strong { color: var(--white); }
+    .chart-bar-bg { height: 10px; background: var(--bg2); border-radius: 5px; overflow: hidden; }
+    .chart-bar {
+      height: 100%; border-radius: 5px;
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 1.2s cubic-bezier(.22,1,.36,1);
+    }
+    .chart-bar.red   { background: rgba(255,80,80,.5); }
+    .chart-bar.green { background: var(--g); }
+    .chart-bar.in    { transform: scaleX(1); }
+    .chart-note { font-size: 11px; color: var(--dim); margin-top: 18px; }
+
+    /* ── OUTPUT CARDS ── */
+    .out-cards { display: flex; flex-direction: column; gap: 12px; }
+    .out-card {
+      background: var(--card); border: 1px solid var(--bd);
+      border-radius: 20px; overflow: hidden;
+      transition: background .35s;
+    }
+    .out-card-top {
+      padding: 22px 20px 0;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .out-icon-big {
+      width: 52px; height: 52px; border-radius: 16px;
+      background: var(--icon-bg); border: 1px solid var(--bd2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+      transition: background .35s;
+    }
+    .out-card-title { font-size: 15px; font-weight: 700; color: var(--white); }
+    .out-card-sub   { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .out-card-body { padding: 18px 20px; }
+    .out-card-body p { font-size: 13px; color: var(--muted); line-height: 1.85; }
+    .out-example {
+      margin-top: 14px;
+      background: var(--bg2); border: 1px solid var(--bd2);
+      border-radius: 12px; padding: 14px 16px;
+    }
+    .out-ex-label { font-size: 9px; font-weight: 700; letter-spacing: .18em; color: var(--dim); text-transform: uppercase; margin-bottom: 7px; }
+    .out-ex-text  { font-size: 12px; color: var(--muted); line-height: 1.9; font-style: italic; }
+    .out-ex-text strong { color: var(--text); font-style: normal; }
+
+    /* ── BEFORE / AFTER ── */
+    .ba-wrap { display: flex; flex-direction: column; gap: 12px; }
+    .ba-card {
+      background: var(--card); border: 1px solid var(--bd);
+      border-radius: 20px; padding: 24px 20px;
+      transition: background .35s;
+    }
+    .ba-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .12em;
+      padding: 4px 10px; border-radius: 20px;
+      display: inline-block; margin-bottom: 18px;
+    }
+    .ba-label.before { color: var(--muted); border: 1px solid var(--bd); }
+    .ba-label.after  { color: #000; background: var(--g); }
+    .ba-steps { display: flex; flex-direction: column; }
+    .ba-step {
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 12px 0; border-bottom: 1px solid var(--bd2);
+    }
+    .ba-step:last-child { border-bottom: none; }
+    .ba-step-icon { font-size: 16px; min-width: 24px; padding-top: 1px; }
+    .ba-step-text { font-size: 13px; line-height: 1.7; }
+    .ba-step-text strong { color: var(--white); display: block; font-size: 13px; margin-bottom: 1px; }
+    .ba-step-text span   { color: var(--muted); font-size: 12px; }
+    .ba-result {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; margin-top: 18px; padding-top: 18px;
+      border-top: 1px solid var(--bd2);
+      font-size: 12px; font-weight: 700;
+    }
+    .ba-result.red   { color: rgba(255,80,80,.7); }
+    .ba-result.green { color: var(--g); }
+
+    /* ── THEORY GRID ── */
+    .theory-header {
+      display: flex; align-items: center; gap: 20px;
+      background: var(--card); border: 1px solid var(--bd);
+      border-radius: 20px; padding: 22px 20px;
+      margin-bottom: 12px; transition: background .35s;
+    }
+    .theory-big-num {
+      font-size: 56px; font-weight: 900; letter-spacing: -.04em;
+      color: var(--g); line-height: 1; flex-shrink: 0;
+    }
+    .theory-big-desc h3  { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 5px; }
+    .theory-big-desc p   { font-size: 12px; color: var(--muted); line-height: 1.7; }
+    .theory-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
+    .t-tile {
+      background: var(--card); border: 1px solid var(--bd);
+      border-radius: 16px; padding: 18px 16px;
+      transition: background .35s;
+    }
+    .t-tile-num  { font-size: 10px; font-weight: 900; color: var(--g); margin-bottom: 6px; }
+    .t-tile-name { font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 3px; line-height: 1.3; }
+    .t-tile-ref  { font-size: 9px;  color: var(--dim); margin-bottom: 7px; }
+    .t-tile-desc { font-size: 11px; color: var(--muted); line-height: 1.7; }
+
+    /* ── CREDIBILITY ── */
+    .cred-card {
+      background: var(--card); border: 1px solid var(--bd);
+      border-radius: 22px; padding: 28px 22px;
+      transition: background .35s;
+    }
+    .cred-top { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+    .cred-ava {
+      width: 58px; height: 58px; border-radius: 50%;
+      border: 2px solid rgba(200,244,100,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 900; color: var(--g);
+      background: rgba(200,244,100,.06); flex-shrink: 0;
+    }
+    [data-theme="light"] .cred-ava { background: rgba(200,244,100,.15); }
+    .cred-name { font-size: 17px; font-weight: 800; color: var(--white); }
+    .cred-sub  { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .cred-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .cs {
+      background: var(--bg2); border: 1px solid var(--bd2);
+      border-radius: 14px; padding: 16px;
+      transition: background .35s;
+    }
+    .cs-num { font-size: 22px; font-weight: 900; color: var(--white); letter-spacing: -.02em; }
+    .cs-num span { font-size: 13px; color: var(--g); margin-left: 1px; }
+    .cs-lbl { font-size: 10px; color: var(--dim); margin-top: 4px; }
+    .cred-bio { font-size: 13px; color: var(--muted); line-height: 1.9; margin-bottom: 20px; }
+    .cred-bio strong { color: var(--text); }
+    .cred-links { display: flex; flex-direction: column; gap: 8px; }
+    .cl-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 13px 16px; border: 1px solid var(--bd); border-radius: 13px;
+      text-decoration: none; font-size: 12px; color: var(--muted);
+    }
+    .cl-link svg { width: 14px; height: 14px; fill: var(--muted); flex-shrink: 0; }
+
+    /* ── VOICES ── */
+    .v-cards { display: flex; flex-direction: column; gap: 12px; }
+    .v-card {
+      background: var(--card); border: 1px solid var(--bd);
+      border-radius: 20px; padding: 24px 20px;
+      transition: background .35s;
+    }
+    .v-stars { font-size: 12px; color: var(--g); margin-bottom: 14px; letter-spacing: 2px; }
+    .v-text {
+      font-size: 14px; font-weight: 600; color: var(--text);
+      line-height: 1.8; margin-bottom: 18px;
+    }
+    .v-text strong { color: var(--g); }
+    .v-footer { display: flex; justify-content: space-between; align-items: center; }
+    .v-info { font-size: 11px; color: var(--muted); }
+    .v-badge { font-size: 10px; color: var(--dim); }
+
+    /* ── CTA ── */
+    .cta {
+      padding: 96px 24px; text-align: center;
+      border-top: 1px solid var(--bd2); position: relative; overflow: hidden;
+    }
+    [data-theme="dark"] .cta::before {
+      content: '';
+      position: absolute; bottom: -30%; left: -20%; width: 140%; height: 90%;
+      background: radial-gradient(ellipse at 50% 100%, rgba(200,244,100,.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .cta-h2 {
+      font-size: clamp(28px, 8vw, 48px); font-weight: 900;
+      letter-spacing: -.03em; line-height: 1.15;
+      color: var(--white); margin-bottom: 14px;
+    }
+    .cta-h2 em { font-style: normal; color: var(--g); }
+    .cta-sub { font-size: 13px; color: var(--muted); margin-bottom: 44px; line-height: 1.9; }
+    .cta-btns { display: flex; flex-direction: column; gap: 10px; max-width: 270px; margin: 0 auto 24px; }
+    .cta-main {
+      display: flex; align-items: center; justify-content: center;
+      background: var(--g); color: #000;
+      font-size: 15px; font-weight: 900; letter-spacing: .03em;
+      padding: 18px 28px; border-radius: 14px; text-decoration: none;
+    }
+    .cta-sub-btn {
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--bd); color: var(--muted);
+      font-size: 12px; padding: 14px 28px; border-radius: 14px; text-decoration: none;
+    }
+    .cta-ig { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--dim); text-decoration: none; }
+    .cta-ig svg { width: 13px; height: 13px; fill: var(--dim); }
+
+    .footer {
+      padding: 22px; text-align: center;
+      font-size: 10px; color: var(--dim); letter-spacing: .08em;
+      border-top: 1px solid var(--bd2);
+    }
+    .footer a { color: var(--dim); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nl">
+    <span class="logo">SEN</span>
+    <span class="for">for coaches</span>
+  </div>
+  <div class="nr">
+    <button class="toggle-btn" onclick="toggleTheme()" id="tb">☀️</button>
+    <a href="https://www.instagram.com/" class="nav-ig" target="_blank">
+      <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+    </a>
+    <a href="https://www.coachsen.com/" class="nav-cta" target="_blank">詳細を聞く</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag"><span class="dot-pulse"></span>SEN for coaches</div>
+  <h1>
+    本音を引き出す<br>
+    <em>仕組み</em>を<br>
+    <span class="soft">持てているか。</span>
+  </h1>
+  <p class="hero-sub">
+    「現状を話してください」に20分使っているなら、<br>問題は技術ではなく仕組みだ。
+  </p>
+  <div class="hero-ctas">
+    <a href="https://www.coachsen.com/" class="btn-g" target="_blank">詳しく話を聞く →</a>
+    <a href="#how" class="btn-outline">どんな仕組みか見る</a>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat reveal" data-count="22">
+    <div class="stat-n"><span class="cnum">0</span><span>問</span></div>
+    <div class="stat-l">AIが設計した<br>質問の数</div>
+  </div>
+  <div class="stat reveal reveal-d1" data-count="3">
+    <div class="stat-n">最大<span class="cnum">0</span><span>回</span></div>
+    <div class="stat-l">AIによる<br>深掘り回数／質問</div>
+  </div>
+  <div class="stat reveal reveal-d2" data-count="11">
+    <div class="stat-n"><span class="cnum">0</span><span>の</span></div>
+    <div class="stat-l">心理学×行動経済学<br>理論を実装</div>
+  </div>
+  <div class="stat reveal reveal-d3" data-count="7500">
+    <div class="stat-n"><span class="cnum">0</span><span>人</span></div>
+    <div class="stat-l">仙石漱<br>Instagramフォロワー</div>
+  </div>
+</div>
+
+<!-- PAIN -->
+<div class="section">
+  <div class="eyebrow reveal">コーチが直面している現実</div>
+  <h2 class="sh2 reveal reveal-d1">なぜ<em>差別化</em>できないか。</h2>
+  <p class="slead reveal reveal-d2">技術より先に、仕組みの問題がある。</p>
+  <div class="pain-grid">
+    <div class="pain-item reveal">
+      <div class="pain-icon">⏱️</div>
+      <div class="pain-txt">
+        <h3>最初の15分が現状確認で消える</h3>
+        <p>「現状を話してください」でクライアントが言語化できず、本題に入れない。コーチの問題ではなく、準備の仕組みの問題。</p>
+      </div>
+    </div>
+    <div class="pain-item reveal reveal-d1">
+      <div class="pain-icon">🤷</div>
+      <div class="pain-txt">
+        <h3>「他と何が違うか」を説明できない</h3>
+        <p>資格・手法・実績——どれも似たり寄ったり。仕組みとして見せられるものがないと、価格で比較されて終わる。</p>
+      </div>
+    </div>
+    <div class="pain-item reveal reveal-d2">
+      <div class="pain-icon">📉</div>
+      <div class="pain-txt">
+        <h3>単価を上げる根拠が作れない</h3>
+        <p>「深いセッションができます」は言葉だけ。再現性のある仕組みを示せないと、高単価の説得力にならない。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section" id="how">
+  <div class="eyebrow reveal">SENの仕組み</div>
+  <h2 class="sh2 reveal reveal-d1">渡すだけで<br><em>セッションが変わる。</em></h2>
+  <p class="slead reveal reveal-d2">コーチがやることは、リンクを1本送るだけ。</p>
+  <div class="flow-nodes">
+    <div class="flow-node reveal">
+      <div class="flow-circle">🔗</div>
+      <div class="flow-content">
+        <h3>コーチがURLを送る</h3>
+        <p>セッション前日にクライアントへリンクを共有。インストール不要、スマホのブラウザだけで動く。</p>
+        <span class="flow-tag">コーチの工数 30秒</span>
+      </div>
+    </div>
+    <div class="flow-node hi reveal reveal-d1">
+      <div class="flow-circle">🤖</div>
+      <div class="flow-content">
+        <h3>AIが22問＋最大3回の深掘り</h3>
+        <p>「わからない」「特にない」で終わらせない。11の心理学理論で設計されたAIが、クライアントの言葉を引き出し続ける。</p>
+        <span class="flow-tag">クライアントが自分でやる</span>
+      </div>
+    </div>
+    <div class="flow-node reveal reveal-d2">
+      <div class="flow-circle">📋</div>
+      <div class="flow-content">
+        <h3>申し送りレポートが自動生成</h3>
+        <p>「核心の悩み仮説」「地雷ワード」「効く問いの方向3つ」がコーチへ届く。セッション準備が5分で完了する。</p>
+        <span class="flow-tag">セッション前に読むだけ</span>
+      </div>
+    </div>
+    <div class="flow-node hi reveal reveal-d3">
+      <div class="flow-circle">💡</div>
+      <div class="flow-content">
+        <h3>初回から深いセッションができる</h3>
+        <p>クライアントはすでに言語化された状態でくる。コーチは最初から本質的な問いを投げられる。</p>
+        <span class="flow-tag">他のコーチとの決定的な差</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BEFORE / AFTER -->
+<div class="section">
+  <div class="eyebrow reveal">導入前後の比較</div>
+  <h2 class="sh2 reveal reveal-d1"><em>何が変わるか</em>、<br>見てほしい。</h2>
+  <p class="slead reveal reveal-d2">同じコーチが、仕組みを持つだけで変わる。</p>
+  <div class="ba-wrap">
+    <div class="ba-card reveal">
+      <span class="ba-label before">SEN なし</span>
+      <div class="ba-steps">
+        <div class="ba-step">
+          <span class="ba-step-icon">😶</span>
+          <div class="ba-step-text">
+            <strong>セッション開始</strong>
+            <span>「現状を話してください」→ 沈黙 or 表面的な話</span>
+          </div>
+        </div>
+        <div class="ba-step">
+          <span class="ba-step-icon">⏳</span>
+          <div class="ba-step-text">
+            <strong>15〜20分：現状確認フェーズ</strong>
+            <span>クライアントが言語化できないまま時間が消える</span>
+          </div>
+        </div>
+        <div class="ba-step">
+          <span class="ba-step-icon">😔</span>
+          <div class="ba-step-text">
+            <strong>残り時間で本題へ</strong>
+            <span>浅いまま終わる。クライアントも「もやもやした」感覚</span>
+          </div>
+        </div>
+      </div>
+      <div class="ba-result red">⚠️ 50分の半分が「準備」に消える</div>
+    </div>
+    <div class="ba-card reveal reveal-d1">
+      <span class="ba-label after">SEN あり</span>
+      <div class="ba-steps">
+        <div class="ba-step">
+          <span class="ba-step-icon">📱</span>
+          <div class="ba-step-text">
+            <strong>前日：自己分析アプリを完了</strong>
+            <span>AIが深掘りし、クライアント自身が言語化を終えている</span>
+          </div>
+        </div>
+        <div class="ba-step">
+          <span class="ba-step-icon">📋</span>
+          <div class="ba-step-text">
+            <strong>セッション前：申し送りレポートを5分で確認</strong>
+            <span>「この人は◯◯を聞かれると動く」が事前にわかる</span>
+          </div>
+        </div>
+        <div class="ba-step">
+          <span class="ba-step-icon">🎯</span>
+          <div class="ba-step-text">
+            <strong>セッション開始 1分で本質へ</strong>
+            <span>クライアントから「このコーチ、わかってくれてる」が生まれる</span>
+          </div>
+        </div>
+      </div>
+      <div class="ba-result green">✓ 50分フルで「深さ」に使える</div>
+    </div>
+  </div>
+</div>
+
+<!-- TIME CHART -->
+<div class="section">
+  <div class="eyebrow reveal">時間の使い方の変化</div>
+  <h2 class="sh2 reveal reveal-d1">50分が<em>まるごと変わる。</em></h2>
+  <div class="chart-wrap reveal reveal-d2">
+    <div class="chart-title">
+      <strong>セッション50分のうち「本質的な対話」に使える時間</strong>
+      導入前後の比較
+    </div>
+    <div class="chart-row">
+      <div class="chart-label"><strong>SEN なし</strong><span>約30分（60%）</span></div>
+      <div class="chart-bar-bg"><div class="chart-bar red" style="width:60%"></div></div>
+    </div>
+    <div class="chart-row">
+      <div class="chart-label"><strong>SEN あり</strong><span>約48分（96%）</span></div>
+      <div class="chart-bar-bg"><div class="chart-bar green" style="width:96%"></div></div>
+    </div>
+    <p class="chart-note">※ 各コーチの体感値をもとにした目安。個人差あり。</p>
+  </div>
+</div>
+
+<!-- OUTPUT -->
+<div class="section">
+  <div class="eyebrow reveal">コーチが得られる3つ</div>
+  <h2 class="sh2 reveal reveal-d1">セッション前に<br><em>全部届く。</em></h2>
+  <div class="out-cards">
+    <div class="out-card reveal">
+      <div class="out-card-top">
+        <div class="out-icon-big">📄</div>
+        <div>
+          <div class="out-card-title">言語化カード</div>
+          <div class="out-card-sub">クライアントの構造が一目でわかる</div>
+        </div>
+      </div>
+      <div class="out-card-body">
+        <p>動く条件・止まる条件・繰り返しパターン・矛盾点を整理したカード。読めばその人の全体像が見える。</p>
+        <div class="out-example">
+          <div class="out-ex-label">レポート例</div>
+          <div class="out-ex-text">「<strong>『誰かに見てほしい』と言いながら、『評価されなくてもやる』とも言っている。</strong>この矛盾を突くと動き出す可能性が高い。」</div>
+        </div>
+      </div>
+    </div>
+    <div class="out-card reveal reveal-d1">
+      <div class="out-card-top">
+        <div class="out-icon-big">⚠️</div>
+        <div>
+          <div class="out-card-title">地雷ワード・回避テーマ</div>
+          <div class="out-card-sub">踏んではいけない場所を事前に知る</div>
+        </div>
+      </div>
+      <div class="out-card-body">
+        <p>回答が短くなった・曖昧にした箇所をAIが自動検出。「今は触れるな」の情報がセッション前に届く。</p>
+        <div class="out-example">
+          <div class="out-ex-label">レポート例</div>
+          <div class="out-ex-text">「<strong>家族との関係について回答が極端に短い。</strong>現時点では直接触れず、信頼が積み上がってから。」</div>
+        </div>
+      </div>
+    </div>
+    <div class="out-card reveal reveal-d2">
+      <div class="out-card-top">
+        <div class="out-icon-big">💬</div>
+        <div>
+          <div class="out-card-title">効く問いの方向（3つ）</div>
+          <div class="out-card-sub">「なぜ効くか」の根拠付きで届く</div>
+        </div>
+      </div>
+      <div class="out-card-body">
+        <p>このクライアントに刺さる問いの角度を3つ提示。根拠もあるのでセッション中に迷わない。</p>
+        <div class="out-example">
+          <div class="out-ex-label">レポート例</div>
+          <div class="out-ex-text">「<strong>『本気でやって負けること』と『失敗すること』の違いを聞く</strong>と核心に触れられる可能性が高い。」</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- THEORY GRID -->
+<div class="section">
+  <div class="eyebrow reveal">理論的根拠</div>
+  <h2 class="sh2 reveal reveal-d1"><em>11の理論</em>を<br>重ねて設計した。</h2>
+  <p class="slead reveal reveal-d2">「なんとなく深い」ではない。証明されてきた研究を実装している。</p>
+  <div class="theory-header reveal">
+    <div class="theory-big-num">11</div>
+    <div class="theory-big-desc">
+      <h3>心理学 × 行動経済学 × コーチング理論</h3>
+      <p>7カ国の研究・実践から選んだ、再現性のある11の理論。すべての質問に根拠がある。</p>
+    </div>
+  </div>
+  <div class="theory-grid">
+    <div class="t-tile reveal">
+      <div class="t-tile-num">01</div>
+      <div class="t-tile-name">行動経済学</div>
+      <div class="t-tile-ref">Kahneman · Thaler · Hershfield</div>
+      <div class="t-tile-desc">現在バイアス・サンクコスト・時間割引を質問に組み込む</div>
+    </div>
+    <div class="t-tile reveal reveal-d1">
+      <div class="t-tile-num">02</div>
+      <div class="t-tile-name">自己決定理論</div>
+      <div class="t-tile-ref">Deci &amp; Ryan, 1985</div>
+      <div class="t-tile-desc">内発的動機と外発的動機を分離する問い設計</div>
+    </div>
+    <div class="t-tile reveal reveal-d2">
+      <div class="t-tile-num">03</div>
+      <div class="t-tile-name">アドラー心理学</div>
+      <div class="t-tile-ref">Alfred Adler</div>
+      <div class="t-tile-desc">承認欲求への依存度を「褒められた vs できた」で測定</div>
+    </div>
+    <div class="t-tile reveal reveal-d3">
+      <div class="t-tile-num">04</div>
+      <div class="t-tile-name">認知行動療法</div>
+      <div class="t-tile-ref">Beck, 1979</div>
+      <div class="t-tile-desc">回避パターン・思考と行動の乖離を特定</div>
+    </div>
+    <div class="t-tile reveal">
+      <div class="t-tile-num">05</div>
+      <div class="t-tile-name">動機づけ面接法</div>
+      <div class="t-tile-ref">Miller &amp; Rollnick, 1991</div>
+      <div class="t-tile-desc">本人の言葉を引用して返す。AIが意見を押しつけない</div>
+    </div>
+    <div class="t-tile reveal reveal-d1">
+      <div class="t-tile-num">06</div>
+      <div class="t-tile-name">ナラティブセラピー</div>
+      <div class="t-tile-ref">White &amp; Epston, 1990</div>
+      <div class="t-tile-desc">物語として語らせることで本音に辿り着く</div>
+    </div>
+    <div class="t-tile reveal reveal-d2">
+      <div class="t-tile-num">07</div>
+      <div class="t-tile-name">実存主義心理学</div>
+      <div class="t-tile-ref">Irvin Yalom</div>
+      <div class="t-tile-desc">「80歳の後悔」で本物の動機だけを残す</div>
+    </div>
+    <div class="t-tile reveal reveal-d3">
+      <div class="t-tile-num">08</div>
+      <div class="t-tile-name">ポジティブ心理学</div>
+      <div class="t-tile-ref">Seligman, 1998</div>
+      <div class="t-tile-desc">強みと「うまくいく条件」を特定し行動につなげる</div>
+    </div>
+    <div class="t-tile reveal">
+      <div class="t-tile-num">09</div>
+      <div class="t-tile-name">ジョハリの窓</div>
+      <div class="t-tile-ref">Luft &amp; Ingham, 1955</div>
+      <div class="t-tile-desc">矛盾・繰り返しパターンを指摘して盲点の窓を開く</div>
+    </div>
+    <div class="t-tile reveal reveal-d1">
+      <div class="t-tile-num">10</div>
+      <div class="t-tile-name">ソクラテス的問答法</div>
+      <div class="t-tile-ref">Socratic Method</div>
+      <div class="t-tile-desc">AIは答えを教えない。問いを返すだけで本人が気づく</div>
+    </div>
+    <div class="t-tile reveal reveal-d2" style="grid-column: span 2;">
+      <div class="t-tile-num">11</div>
+      <div class="t-tile-name">GROWモデル（コーチング心理学）</div>
+      <div class="t-tile-ref">Whitmore, 1992</div>
+      <div class="t-tile-desc">SESSION 1→2→3が「現状把握→課題特定→行動決定」の構造になっている。コーチングの基礎フレームワークそのもの。</div>
+    </div>
+  </div>
+</div>
+
+<!-- VOICES -->
+<div class="section">
+  <div class="eyebrow reveal">使ったコーチの声</div>
+  <h2 class="sh2 reveal reveal-d1">変わったのは<br><em>セッションの深さ。</em></h2>
+  <div class="v-cards">
+    <div class="v-card reveal">
+      <div class="v-stars">★★★★★</div>
+      <p class="v-text">渡す前は最初の15分が現状確認で終わっていた。渡してから<strong>初回から本質的な問いに入れるようになった。</strong>クライアントの満足度が明らかに変わった。</p>
+      <div class="v-footer">
+        <div class="v-info">24歳 · コーチ歴1年 · 利用中</div>
+        <div class="v-badge">導入2ヶ月</div>
+      </div>
+    </div>
+    <div class="v-card reveal reveal-d1">
+      <div class="v-stars">★★★★★</div>
+      <p class="v-text">レポートを読んでからセッションに入るだけで、<strong>「このコーチ、自分のことをわかってる」という信頼がクライアントに生まれる。</strong>差別化の説明が楽になった。</p>
+      <div class="v-footer">
+        <div class="v-info">27歳 · 副業コーチ · 利用中</div>
+        <div class="v-badge">導入1ヶ月</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CREDIBILITY -->
+<div class="section">
+  <div class="eyebrow reveal">作った人</div>
+  <h2 class="sh2 reveal reveal-d1">誰が<em>設計したか。</em></h2>
+  <div class="cred-card reveal reveal-d2">
+    <div class="cred-top">
+      <div class="cred-ava">仙</div>
+      <div>
+        <div class="cred-name">仙石 漱</div>
+        <div class="cred-sub">23歳 · 法人代表 · コーチング事業</div>
+      </div>
+    </div>
+    <div class="cred-stats">
+      <div class="cs">
+        <div class="cs-num">7,500<span>人</span></div>
+        <div class="cs-lbl">Instagramフォロワー</div>
+      </div>
+      <div class="cs">
+        <div class="cs-num">11<span>の</span></div>
+        <div class="cs-lbl">理論を実装</div>
+      </div>
+    </div>
+    <p class="cred-bio">
+      コーチとして多くの20代と向き合う中で、<strong>「本音を引き出す前にセッションが終わる」</strong>という問題を繰り返し経験した。<br><br>
+      技術を磨く前に、<strong>クライアントの準備を整える仕組みが必要だ</strong>と気づいてこのアプリを設計した。
+    </p>
+    <div class="cred-links">
+      <a href="https://www.coachsen.com/" class="cl-link" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        コーチングサービス詳細 — coachsen.com
+      </a>
+      <a href="https://www.instagram.com/" class="cl-link" target="_blank">
+        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        Instagram @sengoku_so — フォロワー7,500人
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <h2 class="cta-h2 reveal">まず、<br><em>話を</em><br>聞いてください。</h2>
+  <p class="cta-sub reveal reveal-d1">価格・詳細・あなたのコーチングへの活かし方まで<br>個別にお伝えします。</p>
+  <div class="cta-btns reveal reveal-d2">
+    <a href="https://www.coachsen.com/" class="cta-main" target="_blank">詳しく話を聞く →</a>
+    <a href="https://self-analysis-app-delta.vercel.app" class="cta-sub-btn" target="_blank">アプリを無料で体験する</a>
+  </div>
+  <a href="https://www.instagram.com/" class="cta-ig reveal reveal-d3" target="_blank">
+    <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+    Instagramでも発信中（7,500人）
+  </a>
+</div>
+
+<div class="footer">
+  © 2026 コーチングSEN ·
+  <a href="https://www.coachsen.com/" target="_blank">coachsen.com</a> ·
+  Powered by Claude Sonnet
+</div>
+
+<script>
+  /* ── THEME TOGGLE ── */
+  function toggleTheme() {
+    const h = document.documentElement;
+    const btn = document.getElementById('tb');
+    if (h.dataset.theme === 'dark') {
+      h.dataset.theme = 'light';
+      btn.textContent = '🌙';
+    } else {
+      h.dataset.theme = 'dark';
+      btn.textContent = '☀️';
+    }
+  }
+
+  /* ── SCROLL REVEAL ── */
+  const revObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); revObs.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+  /* ── ANIMATED COUNTERS ── */
+  function animCount(el, target, dur = 1400) {
+    const t0 = performance.now();
+    const step = (now) => {
+      const p = Math.min((now - t0) / dur, 1);
+      const e = p < .5 ? 4*p*p*p : 1 - Math.pow(-2*p+2,3)/2;
+      el.textContent = Math.round(e * target).toLocaleString('ja-JP');
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  const cntObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const s = e.target;
+        const target = parseInt(s.dataset.count);
+        const el = s.querySelector('.cnum');
+        if (el) animCount(el, target);
+        cntObs.unobserve(s);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('[data-count]').forEach(el => cntObs.observe(el));
+
+  /* ── BAR CHART ANIMATION ── */
+  const barObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.chart-bar').forEach((bar, i) => {
+          setTimeout(() => bar.classList.add('in'), i * 250);
+        });
+        barObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('.chart-wrap').forEach(el => barObs.observe(el));
+</script>
+</body>
+</html>

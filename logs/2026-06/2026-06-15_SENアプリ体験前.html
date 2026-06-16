@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SENアプリ — コーチ専用体験</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #050507;
+      --black: #000000;
+      --card: #101014;
+      --purple: #7c3aed;
+      --purple-light: #a78bfa;
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.5);
+      --dim: rgba(255,255,255,0.25);
+      --border: rgba(255,255,255,0.07);
+      --border-purple: rgba(124,58,237,0.22);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'SF Pro Display', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--purple-light);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      opacity: 0.75;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 20px; height: 1.5px;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    .section-h {
+      font-size: clamp(24px, 6.5vw, 34px);
+      font-weight: 900;
+      line-height: 1.25;
+      letter-spacing: -0.025em;
+      color: #fff;
+    }
+
+
+    /* ═══════════════════════════════
+       ① HERO — コーチ直撃フック
+    ═══════════════════════════════ */
+    .hero {
+      min-height: 100svh;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 72px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 500px; height: 500px;
+      top: -150px; right: -120px;
+      background: radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.3);
+      color: var(--purple-light);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      padding: 7px 14px;
+      border-radius: 100px;
+      margin-bottom: 36px;
+      text-transform: uppercase;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--purple-light);
+      border-radius: 50%;
+      animation: blink 2.2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    /* 問いかけの小見出し */
+    .hero-question {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.38);
+      letter-spacing: 0.06em;
+      margin-bottom: 18px;
+    }
+
+    .hero-h {
+      font-size: clamp(32px, 9vw, 52px);
+      font-weight: 900;
+      line-height: 1.18;
+      letter-spacing: -0.032em;
+      color: #fff;
+      margin-bottom: 32px;
+    }
+
+    .hero-h .ul {
+      text-decoration: underline;
+      text-decoration-color: #7c3aed;
+      text-underline-offset: 6px;
+      text-decoration-thickness: 3px;
+    }
+
+    .hero-body {
+      font-size: 15px;
+      line-height: 1.95;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    /* コーチ向け強調ボックス */
+    .hero-emphasis {
+      background: rgba(124,58,237,0.08);
+      border: 1px solid rgba(124,58,237,0.22);
+      border-left: 3px solid #7c3aed;
+      border-radius: 0 14px 14px 0;
+      padding: 16px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.65;
+    }
+
+
+    /* ═══════════════════════════════
+       ② コーチの3大ペイン
+    ═══════════════════════════════ */
+    .pain-section {
+      padding: 88px 28px;
+      background: var(--black);
+    }
+
+    .pain-sub {
+      font-size: 15px;
+      line-height: 1.9;
+      color: var(--muted);
+      margin: 14px 0 32px;
+    }
+
+    .pain-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .pain-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 左ボーダーカラー */
+    .pain-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+    }
+    .pain-card:nth-child(1)::before { background: rgba(239,68,68,0.6); }
+    .pain-card:nth-child(2)::before { background: rgba(251,146,60,0.6); }
+    .pain-card:nth-child(3)::before { background: rgba(234,179,8,0.6); }
+
+    .pain-icon {
+      font-size: 20px;
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .pain-text-wrap {}
+
+    .pain-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    .pain-desc {
+      font-size: 13px;
+      line-height: 1.72;
+      color: var(--muted);
+    }
+
+
+    /* ═══════════════════════════════
+       ③ デュアルビュー — クライアント体験 × コーチの受け取り
+    ═══════════════════════════════ */
+    .dual-section {
+      padding: 88px 28px;
+      background: var(--bg);
+    }
+
+    .dual-sub {
+      font-size: 15px;
+      line-height: 1.9;
+      color: var(--muted);
+      margin: 14px 0 32px;
+    }
+
+    /* ラベル行 */
+    .dual-labels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .dual-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 7px;
+      border-radius: 8px;
+    }
+
+    .dual-label.client {
+      background: rgba(59,130,246,0.08);
+      border: 1px solid rgba(59,130,246,0.18);
+      color: #93c5fd;
+    }
+
+    .dual-label.coach {
+      background: rgba(124,58,237,0.1);
+      border: 1px solid rgba(124,58,237,0.22);
+      color: var(--purple-light);
+    }
+
+    /* デュアルカード行 */
+    .dual-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .dual-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .dual-cell {
+      padding: 14px 14px;
+      border-radius: 14px;
+      font-size: 12.5px;
+      line-height: 1.65;
+    }
+
+    .dual-cell.client {
+      background: rgba(59,130,246,0.06);
+      border: 1px solid rgba(59,130,246,0.13);
+      color: rgba(255,255,255,0.65);
+    }
+
+    .dual-cell.coach {
+      background: rgba(124,58,237,0.07);
+      border: 1px solid rgba(124,58,237,0.18);
+      color: rgba(255,255,255,0.8);
+    }
+
+    .cell-icon {
+      font-size: 14px;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+
+    /* ═══════════════════════════════
+       ④ フォンデモ — 「これがクライアントの体験」
+    ═══════════════════════════════ */
+    .demo-section {
+      padding: 88px 28px;
+      background: var(--black);
+    }
+
+    .demo-sub {
+      font-size: 15px;
+      line-height: 1.9;
+      color: var(--muted);
+      margin: 14px 0 32px;
+    }
+
+    /* フォンフレーム */
+    .phone-frame {
+      max-width: 340px;
+      margin: 0 auto;
+      background: #0c0c18;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 30px;
+      padding: 24px 20px 28px;
+      box-shadow:
+        0 48px 96px rgba(0,0,0,0.6),
+        0 0 0 1px rgba(255,255,255,0.04) inset,
+        0 1px 0 rgba(255,255,255,0.08) inset;
+    }
+
+    .phone-notch {
+      width: 72px; height: 5px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+      margin: 0 auto 20px;
+    }
+
+    .phone-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .phone-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.06em;
+    }
+
+    .phone-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: #93c5fd;
+      background: rgba(59,130,246,0.12);
+      border: 1px solid rgba(59,130,246,0.25);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .chat-q {
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 16px 16px 16px 4px;
+      padding: 13px 15px;
+      font-size: 13px;
+      line-height: 1.72;
+      color: rgba(255,255,255,0.82);
+    }
+
+    .chat-a {
+      background: rgba(255,255,255,0.055);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px 16px 4px 16px;
+      padding: 13px 15px;
+      font-size: 13px;
+      line-height: 1.72;
+      color: rgba(255,255,255,0.7);
+      align-self: flex-end;
+      text-align: right;
+    }
+
+    .insight-card {
+      background: linear-gradient(135deg, rgba(124,58,237,0.11), rgba(59,130,246,0.07));
+      border: 1px solid rgba(124,58,237,0.24);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .insight-tag {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--purple-light);
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+
+    .insight-text {
+      font-size: 12.5px;
+      line-height: 1.78;
+      color: rgba(255,255,255,0.82);
+    }
+
+    /* 「コーチへ」の補足 */
+    .demo-coach-note {
+      margin-top: 20px;
+      background: rgba(124,58,237,0.07);
+      border: 1px solid var(--border-purple);
+      border-radius: 16px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .demo-coach-note-icon { font-size: 18px; flex-shrink: 0; }
+
+    .demo-coach-note-text {
+      font-size: 13px;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.65);
+    }
+
+    .demo-coach-note-text strong {
+      color: #fff;
+      font-weight: 700;
+    }
+
+
+    /* ═══════════════════════════════
+       ⑤ 深掘り構造バーチャート
+    ═══════════════════════════════ */
+    .depth-section {
+      padding: 88px 28px;
+      background: var(--bg);
+    }
+
+    .depth-sub {
+      font-size: 15px;
+      line-height: 1.9;
+      color: var(--muted);
+      margin: 14px 0 36px;
+    }
+
+    .depth-chart {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .depth-row {
+      display: flex;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .depth-label-col {
+      width: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+
+    .depth-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--dim);
+      text-transform: uppercase;
+      text-align: right;
+      line-height: 1.4;
+    }
+
+    .depth-bar {
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .depth-bar.lv1 {
+      width: 50%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.45);
+    }
+
+    .depth-bar.lv2 {
+      width: 76%;
+      background: rgba(124,58,237,0.08);
+      border: 1px solid rgba(124,58,237,0.18);
+      color: rgba(255,255,255,0.72);
+    }
+
+    .depth-bar.lv3 {
+      width: 100%;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 0 20px rgba(124,58,237,0.15);
+    }
+
+    /* 矢印 */
+    .depth-connector {
+      padding: 0 0 0 58px;
+      color: rgba(124,58,237,0.35);
+      font-size: 16px;
+    }
+
+    .depth-result {
+      margin-top: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .depth-result-icon { font-size: 16px; flex-shrink: 0; }
+
+    .depth-result-text {
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+
+
+    /* ═══════════════════════════════
+       ⑥ CTA — コーチ向け
+    ═══════════════════════════════ */
+    .cta-section {
+      padding: 88px 28px 100px;
+      background: #000;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-glow {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 55% at 50% 100%, rgba(124,58,237,0.18) 0%, transparent 70%);
+    }
+
+    .cta-card {
+      position: relative; z-index: 1;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 28px;
+      padding: 48px 28px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .cta-card::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: 20%; right: 20%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    }
+
+    .cta-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(124,58,237,0.1);
+      border: 1px solid rgba(124,58,237,0.22);
+      color: var(--purple-light);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      text-transform: uppercase;
+    }
+
+    .cta-h {
+      font-size: clamp(28px, 7.5vw, 40px);
+      font-weight: 900;
+      line-height: 1.2;
+      letter-spacing: -0.028em;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    .cta-sub {
+      font-size: 15px;
+      line-height: 1.9;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    .cta-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #fff;
+      color: #000;
+      font-size: 17px;
+      font-weight: 900;
+      padding: 21px 28px;
+      border-radius: 16px;
+      text-decoration: none;
+      letter-spacing: 0.01em;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    .cta-btn:active {
+      transform: scale(0.97);
+      opacity: 0.9;
+    }
+
+    .cta-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 18px;
+      font-size: 12.5px;
+      color: var(--dim);
+    }
+
+    .meta-sep {
+      width: 3px; height: 3px;
+      background: var(--dim);
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+
+
+<!-- ■ ① HERO ■ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <svg style="position:absolute;top:36px;right:18px;opacity:0.08;pointer-events:none" width="190" height="190" viewBox="0 0 190 190" fill="none">
+    <circle cx="95" cy="95" r="94" stroke="white" stroke-width="1"/>
+    <circle cx="95" cy="95" r="65" stroke="white" stroke-width="1" stroke-dasharray="6 8"/>
+    <circle cx="95" cy="95" r="38" stroke="white" stroke-width="1"/>
+    <line x1="95" y1="1" x2="95" y2="189" stroke="white" stroke-width="0.5" opacity="0.5"/>
+    <line x1="1" y1="95" x2="189" y2="95" stroke="white" stroke-width="0.5" opacity="0.5"/>
+    <circle cx="95" cy="1" r="4" fill="white"/>
+    <circle cx="189" cy="95" r="4" fill="white"/>
+  </svg>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      コーチ・コーチ志望者向け
+    </div>
+
+    <div class="hero-question">あなたのクライアント、本音を話せていますか？</div>
+
+    <h1 class="hero-h">
+      クライアントの言葉の奥にある<br>
+      <span class="ul">「本音」</span>に、<br>
+      届いていますか。
+    </h1>
+
+    <p class="hero-body">
+      セッションで「なんとなく」しか出てこない。<br>
+      準備に時間がかかる。深い変容が起きているか不安——<br><br>
+      その課題を解決するツールを、<br>
+      まずコーチ自身が体験してください。
+    </p>
+
+    <div class="hero-emphasis">
+      💡 クライアントに渡す前に、自分で体験する。<br>
+      それが一番の確認方法です。
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ■ ② コーチの3大ペイン ■ -->
+<section class="pain-section">
+  <div class="eyebrow">コーチあるある</div>
+  <h2 class="section-h">セッションで<br>こう感じたことはありますか？</h2>
+  <p class="pain-sub">どのコーチも一度は経験しています。</p>
+
+  <div class="pain-cards">
+    <div class="pain-card">
+      <div class="pain-icon">🌫️</div>
+      <div class="pain-text-wrap">
+        <div class="pain-title">クライアントが「なんとなく」しか言えない</div>
+        <div class="pain-desc">「何が問題かわからない」「うまく言えない」という状態でセッションが始まる。深掘りしたくても入口が見つからない。</div>
+      </div>
+    </div>
+    <div class="pain-card">
+      <div class="pain-icon">⏱️</div>
+      <div class="pain-text-wrap">
+        <div class="pain-title">セッション前の準備が毎回しんどい</div>
+        <div class="pain-desc">「今日は何を聞こう」「どこから入ればいいか」をゼロから考えている。クライアントが増えるほど準備の負担が重くなる。</div>
+      </div>
+    </div>
+    <div class="pain-card">
+      <div class="pain-icon">🎯</div>
+      <div class="pain-text-wrap">
+        <div class="pain-title">本当の課題にたどり着けているか不安</div>
+        <div class="pain-desc">「このクライアントの核心はどこなんだろう」と感じながらセッションを終えてしまう。変容が起きているか確信が持てない。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ■ ③ デュアルビュー ■ -->
+<section class="dual-section">
+  <div class="eyebrow">SENの価値</div>
+  <h2 class="section-h">クライアントが体験すること、<br>コーチが受け取るもの。</h2>
+  <p class="dual-sub">SENは両方を同時に解決します。</p>
+
+  <div class="dual-labels">
+    <div class="dual-label client">👤 クライアント側</div>
+    <div class="dual-label coach">🎯 コーチ側</div>
+  </div>
+
+  <div class="dual-rows">
+    <div class="dual-row">
+      <div class="dual-cell client">
+        <span class="cell-icon">💬</span>
+        AIの深掘りで、自分でも気づいていなかった本音が言語化される
+      </div>
+      <div class="dual-cell coach">
+        <span class="cell-icon">📄</span>
+        申し送りレポートが届く。「地雷ワード」「核心ポイント」が事前にわかる
+      </div>
+    </div>
+    <div class="dual-row">
+      <div class="dual-cell client">
+        <span class="cell-icon">🧠</span>
+        11の心理学理論で設計された問いに答えるだけで、自分の思考パターンが見える
+      </div>
+      <div class="dual-cell coach">
+        <span class="cell-icon">⚡️</span>
+        セッション用の台本が自動生成。準備ゼロで最初から核心に入れる
+      </div>
+    </div>
+    <div class="dual-row">
+      <div class="dual-cell client">
+        <span class="cell-icon">🎯</span>
+        今週やるべき具体的なアクションが提示される
+      </div>
+      <div class="dual-cell coach">
+        <span class="cell-icon">📊</span>
+        全クライアントの回答・進捗をダッシュボードで一覧確認できる
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ■ ④ フォンデモ ■ -->
+<section class="demo-section">
+  <div class="eyebrow">実際の体験</div>
+  <h2 class="section-h">これが、クライアントが<br>体験することです。</h2>
+  <p class="demo-sub">まず自分でやってみてください。<br>コーチとして「これは使える」かどうか、すぐわかります。</p>
+
+  <div class="phone-frame">
+    <div class="phone-notch"></div>
+    <div class="phone-bar">
+      <span class="phone-name">SEN</span>
+      <span class="phone-badge">クライアント視点</span>
+    </div>
+
+    <div class="chat">
+      <div class="chat-q">
+        お金や時間の使い方で、「あ、まだ余裕ないな」と感じた瞬間はありましたか？
+      </div>
+      <div class="chat-a">
+        身近な人のためにお金を使おうとした時、出し渋ってしまって…
+      </div>
+      <div class="chat-q">
+        その「出し渋り」が起きた時、頭の中でどんな言葉が出てきましたか？
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-tag">
+        <span>★</span>
+        AIが引き出した気づき
+      </div>
+      <div class="insight-text">
+        「大切な人を犠牲にするのは意味がない」と頭では分かってる。でも実際には出し渋りが起きている。この乖離は、まだ言語化できていない"条件"があるサインです。
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-coach-note">
+    <span class="demo-coach-note-icon">🎯</span>
+    <div class="demo-coach-note-text">
+      <strong>コーチへ：</strong>この「気づき」の直後に届く申し送りレポートに「ここを深掘りするポイント」と「効く問いの方向」が書かれています。体験後のページで確認できます。
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ■ ⑤ 深掘り構造 ■ -->
+<section class="depth-section">
+  <div class="eyebrow">なぜここまで引き出せるか</div>
+  <h2 class="section-h">表面の言葉から、<br>本音まで3段階で掘る。</h2>
+  <p class="depth-sub">コーチが何時間かけてもたどり着けない層に、5〜10分で届きます。</p>
+
+  <div class="depth-chart">
+    <div class="depth-row">
+      <div class="depth-label-col">
+        <div class="depth-label">表層<br>の言葉</div>
+      </div>
+      <div class="depth-bar lv1">「余裕がない気がする」</div>
+    </div>
+    <div class="depth-connector">↓</div>
+    <div class="depth-row">
+      <div class="depth-label-col">
+        <div class="depth-label">行動の<br>矛盾</div>
+      </div>
+      <div class="depth-bar lv2">「出し渋りが起きている」← 行動との乖離</div>
+    </div>
+    <div class="depth-connector">↓</div>
+    <div class="depth-row">
+      <div class="depth-label-col">
+        <div class="depth-label">核心<br>の本音</div>
+      </div>
+      <div class="depth-bar lv3">「大切な人への罪悪感」← ここが核心</div>
+    </div>
+  </div>
+
+  <div class="depth-result">
+    <span class="depth-result-icon">🧠</span>
+    <div class="depth-result-text">
+      11の心理学理論（CBT・GROWモデル・行動経済学・自己決定理論 など）をもとに設計。「なんとなく深い質問」ではなく、根拠のある深掘りです。
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ■ ⑥ CTA ■ -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+
+  <div class="cta-card">
+    <div class="cta-eyebrow">コーチ・コーチ志望者へ</div>
+
+    <h2 class="cta-h">
+      まず、コーチ自身が<br>
+      体験してください。
+    </h2>
+    <p class="cta-sub">
+      「クライアントにどう響くか」は、<br>
+      自分でやってみた時に一番よくわかります。<br>
+      5〜10分、スマホのブラウザだけで完結します。
+    </p>
+
+    <a href="https://self-analysis-app-delta.vercel.app" class="cta-btn" target="_blank">
+      コーチとして体験してみる
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+
+    <div class="cta-meta">
+      <span>無料</span>
+      <span class="meta-sep"></span>
+      <span>登録不要</span>
+      <span class="meta-sep"></span>
+      <span>5〜10分</span>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

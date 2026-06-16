@@ -79,3 +79,7 @@ echo "生成完了：$(date)" >> "$OUTPUT"
 
 cd "$HOME/sen-board" && git add . && git commit -m "auto: ${DATE} 夜間リサーチ" && git push origin main
 echo "✅ 完了・GitHub push済み：$OUTPUT"
+COACHING SEN
+
+管理画面
+
