@@ -3,27 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SENアプリ — コーチ専用体験</title>
+  <title>SENアプリ — コーチ向け</title>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg: #050507;
-      --black: #000000;
-      --card: #101014;
-      --purple: #7c3aed;
-      --purple-light: #a78bfa;
-      --text: #ffffff;
-      --muted: rgba(255,255,255,0.5);
-      --dim: rgba(255,255,255,0.25);
-      --border: rgba(255,255,255,0.07);
-      --border-purple: rgba(124,58,237,0.22);
+      --black:   #000000;
+      --bg:      #06060f;
+      --card:    #0e0e18;
+      --purple:  #7c3aed;
+      --purple2: #4f46e5;
+      --violet:  #a78bfa;
+      --red:     #dc2626;
+      --red-dim: rgba(220,38,38,0.12);
+      --amber:   #f59e0b;
+      --white:   #ffffff;
+      --muted:   rgba(255,255,255,0.52);
+      --dim:     rgba(255,255,255,0.26);
+      --border:  rgba(255,255,255,0.07);
     }
+
+    html { scroll-behavior: smooth; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'SF Pro Display', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: var(--black);
+      color: var(--white);
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
@@ -33,40 +38,14 @@
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
     }
 
-    .eyebrow {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      color: var(--purple-light);
-      text-transform: uppercase;
-      margin-bottom: 16px;
-      opacity: 0.75;
-    }
-    .eyebrow::before {
-      content: '';
-      width: 20px; height: 1.5px;
-      background: currentColor;
-      flex-shrink: 0;
-    }
 
-    .section-h {
-      font-size: clamp(24px, 6.5vw, 34px);
-      font-weight: 900;
-      line-height: 1.25;
-      letter-spacing: -0.025em;
-      color: #fff;
-    }
-
-
-    /* ═══════════════════════════════
-       ① HERO — コーチ直撃フック
-    ═══════════════════════════════ */
+    /* ═══════════════════════════════════
+       ① HERO — 認知的不協和
+       「できていると思っている」を揺さぶる
+    ═══════════════════════════════════ */
     .hero {
       min-height: 100svh;
-      background: #000;
+      background: var(--black);
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -75,259 +54,349 @@
       overflow: hidden;
     }
 
+    /* グリッドパターン（深さの暗示）*/
     .hero-grid {
       position: absolute; inset: 0;
       background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
       background-size: 48px 48px;
     }
 
+    /* 紫の権威グロウ */
     .hero-glow {
       position: absolute;
-      width: 500px; height: 500px;
-      top: -150px; right: -120px;
-      background: radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 70%);
+      width: 560px; height: 560px;
+      top: -180px; right: -140px;
+      background: radial-gradient(circle, rgba(124,58,237,0.16) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* 底からの光（希望の暗示）*/
+    .hero-glow-bottom {
+      position: absolute;
+      width: 400px; height: 300px;
+      bottom: -100px; left: -60px;
+      background: radial-gradient(ellipse, rgba(124,58,237,0.1) 0%, transparent 70%);
       pointer-events: none;
     }
 
     .hero-content { position: relative; z-index: 1; }
 
-    .hero-badge {
+    /* 赤いアラート — 損失回避を最初に */
+    .hero-alert {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(124,58,237,0.12);
-      border: 1px solid rgba(124,58,237,0.3);
-      color: var(--purple-light);
+      background: rgba(220,38,38,0.1);
+      border: 1px solid rgba(220,38,38,0.28);
+      color: #fca5a5;
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.12em;
       padding: 7px 14px;
       border-radius: 100px;
       margin-bottom: 36px;
       text-transform: uppercase;
     }
 
-    .badge-dot {
+    .alert-dot {
       width: 6px; height: 6px;
-      background: var(--purple-light);
+      background: #f87171;
       border-radius: 50%;
-      animation: blink 2.2s ease-in-out infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.2; }
+      animation: pulse 1.8s ease-in-out infinite;
     }
 
-    /* 問いかけの小見出し */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+
+    /* 問い（認知的不協和） */
     .hero-question {
       font-size: 13px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.38);
-      letter-spacing: 0.06em;
-      margin-bottom: 18px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.04em;
+      margin-bottom: 16px;
     }
 
     .hero-h {
-      font-size: clamp(32px, 9vw, 52px);
+      font-size: clamp(30px, 8.5vw, 50px);
       font-weight: 900;
       line-height: 1.18;
-      letter-spacing: -0.032em;
-      color: #fff;
-      margin-bottom: 32px;
+      letter-spacing: -0.03em;
+      color: var(--white);
+      margin-bottom: 30px;
     }
 
-    .hero-h .ul {
-      text-decoration: underline;
-      text-decoration-color: #7c3aed;
-      text-underline-offset: 6px;
-      text-decoration-thickness: 3px;
+    /* 「表面」を赤でハイライト → 危機感 */
+    .hero-h .danger {
+      color: #fca5a5;
+      border-bottom: 2px solid rgba(220,38,38,0.5);
+      padding-bottom: 2px;
+    }
+
+    /* 「本音」を白でハイライト → 啓示 */
+    .hero-h .truth {
+      background: linear-gradient(120deg, #fff 0%, #c4b5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .hero-body {
       font-size: 15px;
       line-height: 1.95;
       color: var(--muted);
-      margin-bottom: 40px;
+      margin-bottom: 36px;
     }
 
-    /* コーチ向け強調ボックス */
-    .hero-emphasis {
+    /* 権威バッジ */
+    .hero-authority {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px;
       background: rgba(124,58,237,0.08);
-      border: 1px solid rgba(124,58,237,0.22);
-      border-left: 3px solid #7c3aed;
-      border-radius: 0 14px 14px 0;
-      padding: 16px 18px;
-      font-size: 14px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.78);
-      line-height: 1.65;
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 14px;
     }
 
+    .authority-icon { font-size: 20px; flex-shrink: 0; }
 
-    /* ═══════════════════════════════
-       ② コーチの3大ペイン
-    ═══════════════════════════════ */
-    .pain-section {
+    .authority-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.72);
+      line-height: 1.6;
+    }
+
+    .authority-text strong { color: var(--violet); }
+
+
+    /* ═══════════════════════════════════
+       ② 深さの診断 — 自己評価を促す
+       「あなたのセッションはどのレベル？」
+    ═══════════════════════════════════ */
+    .depth-diag-section {
       padding: 88px 28px;
       background: var(--black);
     }
 
-    .pain-sub {
-      font-size: 15px;
-      line-height: 1.9;
-      color: var(--muted);
-      margin: 14px 0 32px;
-    }
-
-    .pain-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .pain-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 20px 18px;
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* 左ボーダーカラー */
-    .pain-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-    }
-    .pain-card:nth-child(1)::before { background: rgba(239,68,68,0.6); }
-    .pain-card:nth-child(2)::before { background: rgba(251,146,60,0.6); }
-    .pain-card:nth-child(3)::before { background: rgba(234,179,8,0.6); }
-
-    .pain-icon {
-      font-size: 20px;
-      width: 44px; height: 44px;
-      background: rgba(255,255,255,0.04);
-      border-radius: 12px;
+    .section-eyebrow {
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--violet);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      opacity: 0.75;
+    }
+    .section-eyebrow::before {
+      content: '';
+      width: 20px; height: 1.5px;
+      background: currentColor;
       flex-shrink: 0;
     }
 
-    .pain-text-wrap {}
+    .section-h {
+      font-size: clamp(22px, 6vw, 32px);
+      font-weight: 900;
+      line-height: 1.25;
+      letter-spacing: -0.022em;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
 
-    .pain-title {
+    .section-sub {
       font-size: 15px;
+      line-height: 1.9;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+
+    /* 深さメーター */
+    .depth-meter {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .depth-level {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .depth-level-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      width: 56px;
+      text-align: right;
+      flex-shrink: 0;
+      line-height: 1.3;
+    }
+
+    .depth-level-bar {
+      flex: 1;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      position: relative;
+    }
+
+    /* Lv1: 表面（赤味） */
+    .depth-level-bar.lv1 {
+      width: 100%;
+      background: var(--red-dim);
+      border: 1px solid rgba(220,38,38,0.2);
+      color: #fca5a5;
+    }
+
+    /* Lv2: 中層 */
+    .depth-level-bar.lv2 {
+      background: rgba(124,58,237,0.07);
+      border: 1px solid rgba(124,58,237,0.18);
+      color: rgba(255,255,255,0.65);
+    }
+
+    /* Lv3: 本音（紫・権威） */
+    .depth-level-bar.lv3 {
+      background: linear-gradient(90deg, rgba(124,58,237,0.18) 0%, rgba(79,70,229,0.12) 100%);
+      border: 1px solid rgba(124,58,237,0.35);
+      color: var(--white);
+      font-weight: 700;
+      box-shadow: 0 0 24px rgba(124,58,237,0.18);
+    }
+
+    /* Lv3の「SEN」タグ */
+    .lv3-tag {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      background: rgba(124,58,237,0.25);
+      border: 1px solid rgba(167,139,250,0.35);
+      color: var(--violet);
+      padding: 3px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+
+    /* コネクター矢印 */
+    .depth-arrow {
+      padding-left: 68px;
+      color: rgba(124,58,237,0.3);
+      font-size: 14px;
+    }
+
+    /* 診断キャプション */
+    .diag-caption {
+      margin-top: 18px;
+      background: rgba(245,158,11,0.07);
+      border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 13px;
+      line-height: 1.75;
+      color: rgba(245,158,11,0.8);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+
+    /* ═══════════════════════════════════
+       ③ 損失の可視化 — 「今失っているもの」
+       損失回避 × 具体的な痛み
+    ═══════════════════════════════════ */
+    .loss-section {
+      padding: 88px 28px;
+      background: #030308;
+      position: relative;
+    }
+
+    .loss-section::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(220,38,38,0.25), transparent);
+    }
+
+    .loss-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 32px;
+    }
+
+    .loss-card {
+      background: var(--red-dim);
+      border: 1px solid rgba(220,38,38,0.18);
+      border-left: 3px solid rgba(220,38,38,0.5);
+      border-radius: 0 16px 16px 0;
+      padding: 18px 18px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .loss-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+    .loss-body {}
+
+    .loss-title {
+      font-size: 14px;
       font-weight: 800;
-      color: #fff;
+      color: #fca5a5;
       margin-bottom: 4px;
       line-height: 1.4;
     }
 
-    .pain-desc {
+    .loss-desc {
       font-size: 13px;
       line-height: 1.72;
-      color: var(--muted);
+      color: rgba(255,255,255,0.48);
     }
 
-
-    /* ═══════════════════════════════
-       ③ デュアルビュー — クライアント体験 × コーチの受け取り
-    ═══════════════════════════════ */
-    .dual-section {
-      padding: 88px 28px;
-      background: var(--bg);
-    }
-
-    .dual-sub {
-      font-size: 15px;
-      line-height: 1.9;
-      color: var(--muted);
-      margin: 14px 0 32px;
-    }
-
-    /* ラベル行 */
-    .dual-labels {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .dual-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      text-align: center;
-      padding: 7px;
-      border-radius: 8px;
-    }
-
-    .dual-label.client {
-      background: rgba(59,130,246,0.08);
-      border: 1px solid rgba(59,130,246,0.18);
-      color: #93c5fd;
-    }
-
-    .dual-label.coach {
-      background: rgba(124,58,237,0.1);
-      border: 1px solid rgba(124,58,237,0.22);
-      color: var(--purple-light);
-    }
-
-    /* デュアルカード行 */
-    .dual-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .dual-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .dual-cell {
-      padding: 14px 14px;
+    /* 損失サマリー */
+    .loss-summary {
+      margin-top: 16px;
+      padding: 18px;
+      background: rgba(220,38,38,0.06);
+      border: 1px solid rgba(220,38,38,0.15);
       border-radius: 14px;
-      font-size: 12.5px;
-      line-height: 1.65;
-    }
-
-    .dual-cell.client {
-      background: rgba(59,130,246,0.06);
-      border: 1px solid rgba(59,130,246,0.13);
-      color: rgba(255,255,255,0.65);
-    }
-
-    .dual-cell.coach {
-      background: rgba(124,58,237,0.07);
-      border: 1px solid rgba(124,58,237,0.18);
-      color: rgba(255,255,255,0.8);
-    }
-
-    .cell-icon {
       font-size: 14px;
-      margin-bottom: 6px;
-      display: block;
+      font-weight: 700;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.65;
+      text-align: center;
     }
 
+    .loss-summary span { color: #fca5a5; }
 
-    /* ═══════════════════════════════
-       ④ フォンデモ — 「これがクライアントの体験」
-    ═══════════════════════════════ */
+
+    /* ═══════════════════════════════════
+       ④ フォンデモ — 体験の予告
+       好奇心ギャップ：「見えそうで見えない」
+    ═══════════════════════════════════ */
     .demo-section {
       padding: 88px 28px;
-      background: var(--black);
+      background: var(--bg);
     }
 
     .demo-sub {
@@ -341,19 +410,20 @@
     .phone-frame {
       max-width: 340px;
       margin: 0 auto;
-      background: #0c0c18;
-      border: 1px solid rgba(255,255,255,0.1);
+      background: #0b0b16;
+      border: 1px solid rgba(255,255,255,0.09);
       border-radius: 30px;
       padding: 24px 20px 28px;
       box-shadow:
-        0 48px 96px rgba(0,0,0,0.6),
+        0 48px 96px rgba(0,0,0,0.7),
         0 0 0 1px rgba(255,255,255,0.04) inset,
         0 1px 0 rgba(255,255,255,0.08) inset;
+      position: relative;
     }
 
     .phone-notch {
       width: 72px; height: 5px;
-      background: rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.07);
       border-radius: 3px;
       margin: 0 auto 20px;
     }
@@ -375,9 +445,9 @@
     .phone-badge {
       font-size: 10px;
       font-weight: 700;
-      color: #93c5fd;
-      background: rgba(59,130,246,0.12);
-      border: 1px solid rgba(59,130,246,0.25);
+      color: var(--violet);
+      background: rgba(124,58,237,0.14);
+      border: 1px solid rgba(124,58,237,0.26);
       padding: 4px 10px;
       border-radius: 20px;
     }
@@ -386,7 +456,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
 
     .chat-q {
@@ -400,22 +470,34 @@
     }
 
     .chat-a {
-      background: rgba(255,255,255,0.055);
+      background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 16px 16px 4px 16px;
       padding: 13px 15px;
       font-size: 13px;
       line-height: 1.72;
-      color: rgba(255,255,255,0.7);
+      color: rgba(255,255,255,0.68);
       align-self: flex-end;
       text-align: right;
     }
 
-    .insight-card {
-      background: linear-gradient(135deg, rgba(124,58,237,0.11), rgba(59,130,246,0.07));
-      border: 1px solid rgba(124,58,237,0.24);
+    /* 結果カード — 一部だけ見せて好奇心を刺激 */
+    .insight-preview {
+      background: linear-gradient(135deg, rgba(124,58,237,0.12), rgba(79,70,229,0.07));
+      border: 1px solid rgba(124,58,237,0.25);
       border-radius: 18px;
       padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* フェードアウト効果で「続きが気になる」を演出 */
+    .insight-preview::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(transparent, #0b0b16);
     }
 
     .insight-tag {
@@ -425,161 +507,157 @@
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.15em;
-      color: var(--purple-light);
+      color: var(--violet);
       text-transform: uppercase;
-      margin-bottom: 9px;
+      margin-bottom: 10px;
     }
 
     .insight-text {
-      font-size: 12.5px;
+      font-size: 13px;
       line-height: 1.78;
-      color: rgba(255,255,255,0.82);
+      color: rgba(255,255,255,0.8);
     }
 
-    /* 「コーチへ」の補足 */
-    .demo-coach-note {
+    /* 「続きは体験後に」のラベル */
+    .preview-more {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--violet);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    /* コーチ向け注釈 */
+    .coach-note {
       margin-top: 20px;
       background: rgba(124,58,237,0.07);
-      border: 1px solid var(--border-purple);
-      border-radius: 16px;
-      padding: 16px 18px;
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 14px;
+      padding: 16px;
       display: flex;
-      align-items: flex-start;
       gap: 10px;
+      align-items: flex-start;
     }
 
-    .demo-coach-note-icon { font-size: 18px; flex-shrink: 0; }
+    .coach-note-icon { font-size: 18px; flex-shrink: 0; }
 
-    .demo-coach-note-text {
+    .coach-note-text {
       font-size: 13px;
       line-height: 1.75;
-      color: rgba(255,255,255,0.65);
+      color: rgba(255,255,255,0.6);
     }
 
-    .demo-coach-note-text strong {
-      color: #fff;
-      font-weight: 700;
-    }
+    .coach-note-text strong { color: var(--violet); }
 
 
-    /* ═══════════════════════════════
-       ⑤ 深掘り構造バーチャート
-    ═══════════════════════════════ */
-    .depth-section {
+    /* ═══════════════════════════════════
+       ⑤ 権威 × データ — 11理論チャート
+    ═══════════════════════════════════ */
+    .authority-section {
       padding: 88px 28px;
-      background: var(--bg);
+      background: var(--black);
     }
 
-    .depth-sub {
-      font-size: 15px;
-      line-height: 1.9;
-      color: var(--muted);
-      margin: 14px 0 36px;
-    }
-
-    .depth-chart {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .depth-row {
-      display: flex;
-      align-items: stretch;
-      gap: 12px;
-    }
-
-    .depth-label-col {
-      width: 46px;
+    /* リングカード */
+    .ring-card-solo {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px 24px;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
+      gap: 24px;
+      margin-top: 32px;
+      margin-bottom: 16px;
+    }
+
+    .ring-wrap {
+      position: relative;
+      width: 100px; height: 100px;
       flex-shrink: 0;
     }
 
-    .depth-label {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      color: var(--dim);
-      text-transform: uppercase;
-      text-align: right;
-      line-height: 1.4;
-    }
+    .ring-wrap svg { width: 100%; height: 100%; }
 
-    .depth-bar {
-      height: 56px;
-      border-radius: 12px;
+    .ring-inner {
+      position: absolute; inset: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      padding: 0 16px;
+      justify-content: center;
+    }
+
+    .ring-num {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      background: linear-gradient(135deg, #c4b5fd, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .ring-unit { font-size: 11px; color: var(--dim); margin-top: 2px; }
+
+    .ring-body {}
+
+    .ring-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--white);
+      margin-bottom: 8px;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+
+    .ring-desc {
       font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .depth-bar.lv1 {
-      width: 50%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      color: rgba(255,255,255,0.45);
-    }
-
-    .depth-bar.lv2 {
-      width: 76%;
-      background: rgba(124,58,237,0.08);
-      border: 1px solid rgba(124,58,237,0.18);
-      color: rgba(255,255,255,0.72);
-    }
-
-    .depth-bar.lv3 {
-      width: 100%;
-      background: rgba(124,58,237,0.15);
-      border: 1px solid rgba(124,58,237,0.3);
-      color: #fff;
-      font-weight: 700;
-      box-shadow: 0 0 20px rgba(124,58,237,0.15);
-    }
-
-    /* 矢印 */
-    .depth-connector {
-      padding: 0 0 0 58px;
-      color: rgba(124,58,237,0.35);
-      font-size: 16px;
-    }
-
-    .depth-result {
-      margin-top: 16px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px 18px;
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-    }
-
-    .depth-result-icon { font-size: 16px; flex-shrink: 0; }
-
-    .depth-result-text {
-      font-size: 13px;
-      line-height: 1.75;
+      line-height: 1.72;
       color: var(--muted);
     }
 
+    /* 理論チップ */
+    .theory-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
 
-    /* ═══════════════════════════════
-       ⑥ CTA — コーチ向け
-    ═══════════════════════════════ */
+    .theory-chip {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 11.5px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .theory-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--violet);
+      flex-shrink: 0;
+    }
+
+
+    /* ═══════════════════════════════════
+       ⑥ CTA — 好奇心ギャップ × 行動促進
+    ═══════════════════════════════════ */
     .cta-section {
       padding: 88px 28px 100px;
-      background: #000;
+      background: var(--black);
       position: relative;
       overflow: hidden;
     }
 
     .cta-glow {
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 55% at 50% 100%, rgba(124,58,237,0.18) 0%, transparent 70%);
+      background: radial-gradient(ellipse 80% 55% at 50% 100%, rgba(124,58,237,0.2) 0%, transparent 70%);
     }
 
     .cta-card {
@@ -599,13 +677,14 @@
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
     }
 
-    .cta-eyebrow {
+    /* ターゲット明示バッジ */
+    .cta-target {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       background: rgba(124,58,237,0.1);
-      border: 1px solid rgba(124,58,237,0.22);
-      color: var(--purple-light);
+      border: 1px solid rgba(124,58,237,0.24);
+      color: var(--violet);
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.12em;
@@ -616,11 +695,11 @@
     }
 
     .cta-h {
-      font-size: clamp(28px, 7.5vw, 40px);
+      font-size: clamp(26px, 7vw, 38px);
       font-weight: 900;
       line-height: 1.2;
-      letter-spacing: -0.028em;
-      color: #fff;
+      letter-spacing: -0.026em;
+      color: var(--white);
       margin-bottom: 16px;
     }
 
@@ -628,16 +707,26 @@
       font-size: 15px;
       line-height: 1.9;
       color: var(--muted);
-      margin-bottom: 40px;
+      margin-bottom: 16px;
     }
 
+    /* 好奇心ギャップの一文 */
+    .cta-gap {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--violet);
+      margin-bottom: 36px;
+      line-height: 1.6;
+    }
+
+    /* 白ボタン — 最大コントラスト */
     .cta-btn {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      background: #fff;
-      color: #000;
+      background: var(--white);
+      color: var(--black);
       font-size: 17px;
       font-weight: 900;
       padding: 21px 28px;
@@ -647,10 +736,7 @@
       transition: transform 0.15s, opacity 0.15s;
     }
 
-    .cta-btn:active {
-      transform: scale(0.97);
-      opacity: 0.9;
-    }
+    .cta-btn:active { transform: scale(0.97); opacity: 0.9; }
 
     .cta-meta {
       display: flex;
@@ -672,78 +758,51 @@
 <body>
 
 
-<!-- ■ ① HERO ■ -->
+<!-- ■ ① HERO — 認知的不協和 ■ -->
 <section class="hero">
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
+  <div class="hero-glow-bottom"></div>
 
-  <svg style="position:absolute;top:36px;right:18px;opacity:0.08;pointer-events:none" width="190" height="190" viewBox="0 0 190 190" fill="none">
-    <circle cx="95" cy="95" r="94" stroke="white" stroke-width="1"/>
-    <circle cx="95" cy="95" r="65" stroke="white" stroke-width="1" stroke-dasharray="6 8"/>
-    <circle cx="95" cy="95" r="38" stroke="white" stroke-width="1"/>
-    <line x1="95" y1="1" x2="95" y2="189" stroke="white" stroke-width="0.5" opacity="0.5"/>
-    <line x1="1" y1="95" x2="189" y2="95" stroke="white" stroke-width="0.5" opacity="0.5"/>
-    <circle cx="95" cy="1" r="4" fill="white"/>
-    <circle cx="189" cy="95" r="4" fill="white"/>
+  <svg style="position:absolute;top:32px;right:16px;opacity:0.07;pointer-events:none" width="200" height="200" viewBox="0 0 200 200" fill="none">
+    <circle cx="100" cy="100" r="99" stroke="white" stroke-width="1"/>
+    <circle cx="100" cy="100" r="70" stroke="white" stroke-width="1" stroke-dasharray="5 8"/>
+    <circle cx="100" cy="100" r="42" stroke="white" stroke-width="1"/>
+    <line x1="100" y1="1" x2="100" y2="199" stroke="white" stroke-width="0.5" opacity="0.5"/>
+    <line x1="1" y1="100" x2="199" y2="100" stroke="white" stroke-width="0.5" opacity="0.5"/>
+    <circle cx="100" cy="1" r="4" fill="white"/>
+    <circle cx="199" cy="100" r="4" fill="white"/>
   </svg>
 
   <div class="hero-content">
-    <div class="hero-badge">
-      <span class="badge-dot"></span>
-      コーチ・コーチ志望者向け
+    <!-- 赤アラート → 損失回避を最初に起動 -->
+    <div class="hero-alert">
+      <span class="alert-dot"></span>
+      コーチ・コーチ志望者へ
     </div>
 
     <div class="hero-question">あなたのクライアント、本音を話せていますか？</div>
 
     <h1 class="hero-h">
-      クライアントの言葉の奥にある<br>
-      <span class="ul">「本音」</span>に、<br>
-      届いていますか。
+      セッションは<br>
+      <span class="danger">表面で終わっている</span><br>
+      かもしれない。
     </h1>
 
     <p class="hero-body">
-      セッションで「なんとなく」しか出てこない。<br>
-      準備に時間がかかる。深い変容が起きているか不安——<br><br>
-      その課題を解決するツールを、<br>
-      まずコーチ自身が体験してください。
+      「なんとなく話してくれた」「それなりに深まった」——<br>
+      でも、その下にある<span class="truth" style="font-weight:700">「本当の核心」</span>に<br>
+      たどり着けているコーチは、ほとんどいません。<br><br>
+      それを確かめる方法があります。
     </p>
 
-    <div class="hero-emphasis">
-      💡 クライアントに渡す前に、自分で体験する。<br>
-      それが一番の確認方法です。
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-
-<!-- ■ ② コーチの3大ペイン ■ -->
-<section class="pain-section">
-  <div class="eyebrow">コーチあるある</div>
-  <h2 class="section-h">セッションで<br>こう感じたことはありますか？</h2>
-  <p class="pain-sub">どのコーチも一度は経験しています。</p>
-
-  <div class="pain-cards">
-    <div class="pain-card">
-      <div class="pain-icon">🌫️</div>
-      <div class="pain-text-wrap">
-        <div class="pain-title">クライアントが「なんとなく」しか言えない</div>
-        <div class="pain-desc">「何が問題かわからない」「うまく言えない」という状態でセッションが始まる。深掘りしたくても入口が見つからない。</div>
-      </div>
-    </div>
-    <div class="pain-card">
-      <div class="pain-icon">⏱️</div>
-      <div class="pain-text-wrap">
-        <div class="pain-title">セッション前の準備が毎回しんどい</div>
-        <div class="pain-desc">「今日は何を聞こう」「どこから入ればいいか」をゼロから考えている。クライアントが増えるほど準備の負担が重くなる。</div>
-      </div>
-    </div>
-    <div class="pain-card">
-      <div class="pain-icon">🎯</div>
-      <div class="pain-text-wrap">
-        <div class="pain-title">本当の課題にたどり着けているか不安</div>
-        <div class="pain-desc">「このクライアントの核心はどこなんだろう」と感じながらセッションを終えてしまう。変容が起きているか確信が持てない。</div>
+    <!-- 権威の暗示 -->
+    <div class="hero-authority">
+      <span class="authority-icon">🧠</span>
+      <div class="authority-text">
+        <strong>11の心理学理論</strong>をもとに設計されたAIが、
+        コーチでも届けにくい「本音の層」まで引き出します。
+        まずコーチ自身が体験して確かめてください。
       </div>
     </div>
   </div>
@@ -752,65 +811,90 @@
 <div class="divider"></div>
 
 
-<!-- ■ ③ デュアルビュー ■ -->
-<section class="dual-section">
-  <div class="eyebrow">SENの価値</div>
-  <h2 class="section-h">クライアントが体験すること、<br>コーチが受け取るもの。</h2>
-  <p class="dual-sub">SENは両方を同時に解決します。</p>
+<!-- ■ ② 深さの診断 — 自己評価 ■ -->
+<section class="depth-diag-section">
+  <div class="section-eyebrow">セッションの深さ診断</div>
+  <h2 class="section-h">今のセッション、<br>どの層まで届いていますか？</h2>
+  <p class="section-sub">ほとんどのコーチが、Lv1〜Lv2で終わっています。</p>
 
-  <div class="dual-labels">
-    <div class="dual-label client">👤 クライアント側</div>
-    <div class="dual-label coach">🎯 コーチ側</div>
+  <div class="depth-meter">
+    <div class="depth-level">
+      <div class="depth-level-label">Lv 1<br>表面</div>
+      <div class="depth-level-bar lv1">「なんとなく悩んでいる」の言語化まで</div>
+    </div>
+    <div class="depth-arrow">↓</div>
+    <div class="depth-level">
+      <div class="depth-level-label">Lv 2<br>中層</div>
+      <div class="depth-level-bar lv2">行動との矛盾・回避パターンの特定まで</div>
+    </div>
+    <div class="depth-arrow">↓</div>
+    <div class="depth-level">
+      <div class="depth-level-label">Lv 3<br>核心</div>
+      <div class="depth-level-bar lv3">
+        本音・価値観・恐れの根っこまで
+        <span class="lv3-tag">SEN</span>
+      </div>
+    </div>
   </div>
 
-  <div class="dual-rows">
-    <div class="dual-row">
-      <div class="dual-cell client">
-        <span class="cell-icon">💬</span>
-        AIの深掘りで、自分でも気づいていなかった本音が言語化される
-      </div>
-      <div class="dual-cell coach">
-        <span class="cell-icon">📄</span>
-        申し送りレポートが届く。「地雷ワード」「核心ポイント」が事前にわかる
-      </div>
-    </div>
-    <div class="dual-row">
-      <div class="dual-cell client">
-        <span class="cell-icon">🧠</span>
-        11の心理学理論で設計された問いに答えるだけで、自分の思考パターンが見える
-      </div>
-      <div class="dual-cell coach">
-        <span class="cell-icon">⚡️</span>
-        セッション用の台本が自動生成。準備ゼロで最初から核心に入れる
-      </div>
-    </div>
-    <div class="dual-row">
-      <div class="dual-cell client">
-        <span class="cell-icon">🎯</span>
-        今週やるべき具体的なアクションが提示される
-      </div>
-      <div class="dual-cell coach">
-        <span class="cell-icon">📊</span>
-        全クライアントの回答・進捗をダッシュボードで一覧確認できる
-      </div>
-    </div>
+  <div class="diag-caption">
+    <span>⚠️</span>
+    <span>Lv3まで届かないと、クライアントの行動は変わりにくい。でも通常のセッションでここまで到達するのは難しい——SENはそれを解決するために設計されています。</span>
   </div>
 </section>
 
 <div class="divider"></div>
 
 
-<!-- ■ ④ フォンデモ ■ -->
+<!-- ■ ③ 損失の可視化 ■ -->
+<section class="loss-section">
+  <div class="section-eyebrow">今、失っているもの</div>
+  <h2 class="section-h">SENなしのコーチが<br>毎回失っていること。</h2>
+
+  <div class="loss-cards">
+    <div class="loss-card">
+      <span class="loss-icon">🌫️</span>
+      <div class="loss-body">
+        <div class="loss-title">クライアントの「本音」を取り逃している</div>
+        <div class="loss-desc">「なんとなく」で終わったセッション。その奥にあった核心に、あなたはまだたどり着けていないかもしれない。</div>
+      </div>
+    </div>
+    <div class="loss-card">
+      <span class="loss-icon">⏱️</span>
+      <div class="loss-body">
+        <div class="loss-title">毎回の準備時間を「無駄に」使っている</div>
+        <div class="loss-desc">ゼロから「何を聞こう」を考える時間。クライアントが増えるほど積み重なる準備コスト。</div>
+      </div>
+    </div>
+    <div class="loss-card">
+      <span class="loss-icon">📉</span>
+      <div class="loss-body">
+        <div class="loss-title">他のコーチとの差別化ができていない</div>
+        <div class="loss-desc">「コーチ」というだけでは選ばれない。なぜあなたに依頼するのかを、言語化できていない。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loss-summary">
+    これは<span>「今うまくいっていない」</span>話ではない。<br>
+    うまくいっているように見えて、<span>もっとうまくいけた</span>という話です。
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ■ ④ フォンデモ — 好奇心ギャップ ■ -->
 <section class="demo-section">
-  <div class="eyebrow">実際の体験</div>
-  <h2 class="section-h">これが、クライアントが<br>体験することです。</h2>
-  <p class="demo-sub">まず自分でやってみてください。<br>コーチとして「これは使える」かどうか、すぐわかります。</p>
+  <div class="section-eyebrow">実際の体験</div>
+  <h2 class="section-h">これが、SENが<br>引き出す深さです。</h2>
+  <p class="demo-sub">クライアントが体験することを、まずコーチ自身が確認してください。</p>
 
   <div class="phone-frame">
     <div class="phone-notch"></div>
     <div class="phone-bar">
       <span class="phone-name">SEN</span>
-      <span class="phone-badge">クライアント視点</span>
+      <span class="phone-badge">SESSION 1</span>
     </div>
 
     <div class="chat">
@@ -825,61 +909,23 @@
       </div>
     </div>
 
-    <div class="insight-card">
+    <!-- 好奇心ギャップ: 一部だけ見せてフェードアウト -->
+    <div class="insight-preview">
       <div class="insight-tag">
         <span>★</span>
-        AIが引き出した気づき
+        SENが引き出した気づき
       </div>
       <div class="insight-text">
-        「大切な人を犠牲にするのは意味がない」と頭では分かってる。でも実際には出し渋りが起きている。この乖離は、まだ言語化できていない"条件"があるサインです。
+        「大切な人を犠牲にするのは意味がない」と頭では分かってる。でも実際には出し渋りが起きている。この乖離は——
       </div>
     </div>
+    <div class="preview-more">→ 続きは体験後に届きます</div>
   </div>
 
-  <div class="demo-coach-note">
-    <span class="demo-coach-note-icon">🎯</span>
-    <div class="demo-coach-note-text">
-      <strong>コーチへ：</strong>この「気づき」の直後に届く申し送りレポートに「ここを深掘りするポイント」と「効く問いの方向」が書かれています。体験後のページで確認できます。
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-
-<!-- ■ ⑤ 深掘り構造 ■ -->
-<section class="depth-section">
-  <div class="eyebrow">なぜここまで引き出せるか</div>
-  <h2 class="section-h">表面の言葉から、<br>本音まで3段階で掘る。</h2>
-  <p class="depth-sub">コーチが何時間かけてもたどり着けない層に、5〜10分で届きます。</p>
-
-  <div class="depth-chart">
-    <div class="depth-row">
-      <div class="depth-label-col">
-        <div class="depth-label">表層<br>の言葉</div>
-      </div>
-      <div class="depth-bar lv1">「余裕がない気がする」</div>
-    </div>
-    <div class="depth-connector">↓</div>
-    <div class="depth-row">
-      <div class="depth-label-col">
-        <div class="depth-label">行動の<br>矛盾</div>
-      </div>
-      <div class="depth-bar lv2">「出し渋りが起きている」← 行動との乖離</div>
-    </div>
-    <div class="depth-connector">↓</div>
-    <div class="depth-row">
-      <div class="depth-label-col">
-        <div class="depth-label">核心<br>の本音</div>
-      </div>
-      <div class="depth-bar lv3">「大切な人への罪悪感」← ここが核心</div>
-    </div>
-  </div>
-
-  <div class="depth-result">
-    <span class="depth-result-icon">🧠</span>
-    <div class="depth-result-text">
-      11の心理学理論（CBT・GROWモデル・行動経済学・自己決定理論 など）をもとに設計。「なんとなく深い質問」ではなく、根拠のある深掘りです。
+  <div class="coach-note">
+    <span class="coach-note-icon">🎯</span>
+    <div class="coach-note-text">
+      <strong>コーチへ：</strong>この後に届く申し送りレポートに「地雷ワード」「深掘りポイント」「効く問いの方向」が自動生成されます。体験後のページで確認できます。
     </div>
   </div>
 </section>
@@ -887,27 +933,76 @@
 <div class="divider"></div>
 
 
-<!-- ■ ⑥ CTA ■ -->
+<!-- ■ ⑤ 権威 — 11理論 ■ -->
+<section class="authority-section">
+  <div class="section-eyebrow">根拠のある深掘り</div>
+  <h2 class="section-h">「なんとなく深い」は、<br>武器にならない。</h2>
+
+  <div class="ring-card-solo">
+    <div class="ring-wrap">
+      <svg viewBox="0 0 110 110" fill="none" style="transform:rotate(-90deg)">
+        <defs>
+          <linearGradient id="rg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#a78bfa"/>
+            <stop offset="100%" stop-color="#60a5fa"/>
+          </linearGradient>
+        </defs>
+        <circle cx="55" cy="55" r="44" stroke="rgba(255,255,255,0.05)" stroke-width="9" fill="none"/>
+        <!-- 11セグメント: circumference≈276.5, dash=23.1, gap=2 -->
+        <circle cx="55" cy="55" r="44" stroke="url(#rg)" stroke-width="9" fill="none"
+          stroke-dasharray="23.1 2" stroke-linecap="butt"/>
+      </svg>
+      <div class="ring-inner">
+        <span class="ring-num">11</span>
+        <span class="ring-unit">理論</span>
+      </div>
+    </div>
+    <div class="ring-body">
+      <div class="ring-title">11の心理学理論を<br>実装した深掘り</div>
+      <div class="ring-desc">根拠のある質問設計だから、クライアントの抵抗なく核心まで届く。「なぜその質問をするのか」をコーチが説明できるようになる。</div>
+    </div>
+  </div>
+
+  <div class="theory-grid">
+    <div class="theory-chip"><span class="theory-dot"></span>認知行動療法（CBT）</div>
+    <div class="theory-chip"><span class="theory-dot"></span>GROWモデル</div>
+    <div class="theory-chip"><span class="theory-dot"></span>自己決定理論</div>
+    <div class="theory-chip"><span class="theory-dot"></span>行動経済学</div>
+    <div class="theory-chip"><span class="theory-dot"></span>ポジティブ心理学</div>
+    <div class="theory-chip"><span class="theory-dot"></span>マインドフルネス</div>
+    <div class="theory-chip"><span class="theory-dot"></span>アドラー心理学</div>
+    <div class="theory-chip"><span class="theory-dot"></span>ナラティブ療法</div>
+    <div class="theory-chip"><span class="theory-dot"></span>ジョハリの窓</div>
+    <div class="theory-chip"><span class="theory-dot"></span>意味療法</div>
+    <div class="theory-chip" style="grid-column:1/-1"><span class="theory-dot"></span>ソリューションフォーカスト・アプローチ</div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+
+<!-- ■ ⑥ CTA — 好奇心ギャップ × 行動促進 ■ -->
 <section class="cta-section">
   <div class="cta-glow"></div>
 
   <div class="cta-card">
-    <div class="cta-eyebrow">コーチ・コーチ志望者へ</div>
+    <div class="cta-target">コーチ・コーチ志望者向け</div>
 
     <h2 class="cta-h">
-      まず、コーチ自身が<br>
-      体験してください。
+      体験してみないと、<br>わからない深さがあります。
     </h2>
     <p class="cta-sub">
-      「クライアントにどう響くか」は、<br>
-      自分でやってみた時に一番よくわかります。<br>
-      5〜10分、スマホのブラウザだけで完結します。
+      「これはすごい」か「自分には合わない」か——<br>
+      どちらにしても、やってみた時にしかわかりません。
     </p>
+    <div class="cta-gap">
+      5〜10分、スマホのブラウザだけで完結します。
+    </div>
 
     <a href="https://self-analysis-app-delta.vercel.app" class="cta-btn" target="_blank">
-      コーチとして体験してみる
+      コーチとして今すぐ体験する
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M3 8h10M9 4l4 4-4 4" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="black" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </a>
 
