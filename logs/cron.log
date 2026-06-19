@@ -2,3 +2,18 @@
 [02:00] 2. EC戦略 完了
 [02:00] 3. スケの営業進捗 完了
 [02:00] 4. チーム状況 完了
+[main 412d0da] auto: 2026-06-17 夜間リサーチ
+ 11 files changed, 4854 insertions(+), 448 deletions(-)
+ create mode 100644 index.html
+ create mode 100644 "logs/2026-06/2026-06-17_\345\244\234\351\226\223\343\203\252\343\202\265\343\203\274\343\203\201.md"
+ create mode 100644 logs/cron.log
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/PROGRESS.md"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/data/categories.js"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/data/farmers.js"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/data/products.js"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/index.html"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/solato/index.html"
+fatal: could not read Username for 'https://github.com': Device not configured
+✅ 完了・GitHub push済み：/Users/sou/sen-board/logs/2026-06/2026-06-17_夜間リサーチ.md
+./scripts/night_research.sh: line 82: COACHING: command not found
+./scripts/night_research.sh: line 84: 管理画面: command not found

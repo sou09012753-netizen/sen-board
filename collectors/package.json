@@ -1,0 +1,9 @@
+{
+  "name": "sen-collectors",
+  "version": "1.0.0",
+  "description": "SEN board data collectors",
+  "type": "commonjs",
+  "dependencies": {
+    "cheerio": "^1.0.0"
+  }
+}
