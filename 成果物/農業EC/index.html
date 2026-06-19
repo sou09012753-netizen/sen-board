@@ -14,32 +14,37 @@
 /* ══ RESET ══ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:#05100A;color:#EAE4D6;font-family:'Noto Serif JP',serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--f-serif);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 button{cursor:pointer;border:none;background:none;font:inherit;color:inherit}
 ul,ol{list-style:none}
+img{display:block;max-width:100%;height:auto}
 
 /* ══ TOKENS ══ */
 :root{
   --hero-bg:#05100A;
-  --dark:#0D1A0F;
-  --dark2:#152018;
-  --light-bg:#F5F0E8;
-  --cream:#EDE8DF;
-  --bd:rgba(255,255,255,.08);
-  --bdl:#DDD8CE;
-  --text-hero:#EAE4D6;
-  --text-sub:rgba(234,228,214,.55);
-  --text-body:#1C1916;
-  --text-muted:#6A6058;
+  --bg:#F5F0E8;
+  --bg2:#EDE8DF;
+  --bg3:#E6E0D6;
+  --bg-dark:#1C1916;
+  --text:#1C1916;
+  --muted:#6A6058;
+  --sub:#9A928A;
+  --hero-text:#EAE4D6;
+  --hero-sub:rgba(234,228,214,.55);
   --gold:#C49A30;
   --gold2:#A87820;
   --berry:#A32C40;
+  --green:#1A4C1E;
+  --bd:rgba(0,0,0,.1);
+  --bdh:rgba(0,0,0,.18);
+  --bd-hero:rgba(255,255,255,.08);
   --f-serif:'Noto Serif JP',serif;
   --f-sans:'Noto Sans JP',sans-serif;
   --f-label:'EB Garamond',serif;
   --nav-h:72px;
   --ease:cubic-bezier(.25,.46,.45,.94);
+  --ease-out:cubic-bezier(.16,1,.3,1);
 }
 
 /* ══ LOADER ══ */
@@ -50,23 +55,16 @@ ul,ol{list-style:none}
 }
 #loader.out{opacity:0;visibility:hidden;pointer-events:none}
 .loader-content{text-align:center}
-.loader-brand{
-  font-family:var(--f-label);font-size:2.4rem;letter-spacing:.2em;color:var(--gold);margin-bottom:6px;
-}
-.loader-brand sup{font-size:.5em;vertical-align:super}
-.loader-sub{font-size:.58rem;letter-spacing:.38em;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:32px}
+.loader-brand{font-family:var(--f-label);font-size:2.4rem;letter-spacing:.22em;color:var(--gold);margin-bottom:6px}
+.loader-sub{font-size:.58rem;letter-spacing:.38em;color:rgba(255,255,255,.28);text-transform:uppercase;margin-bottom:32px}
 .loader-spinner svg{animation:spin 1.2s linear infinite;transform-origin:center}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loader-credit{
-  position:absolute;bottom:24px;right:24px;
-  font-family:var(--f-label);font-size:.6rem;letter-spacing:.15em;color:rgba(255,255,255,.2);
-  writing-mode:vertical-rl;
-}
+.loader-credit{position:absolute;bottom:24px;right:24px;font-family:var(--f-label);font-size:.6rem;letter-spacing:.15em;color:rgba(255,255,255,.18);writing-mode:vertical-rl}
 
 /* ══ GRAIN ══ */
 .grain{
   position:fixed;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:9998;
-  opacity:.04;mix-blend-mode:overlay;
+  opacity:.032;mix-blend-mode:multiply;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   animation:grain .18s steps(1) infinite;
 }
@@ -76,59 +74,54 @@ ul,ol{list-style:none}
 #nav{
   position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:200;
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 32px;
-  transition:background .5s,border-color .5s;border-bottom:1px solid transparent;
+  padding:0 40px;
+  transition:background .4s,border-color .4s,box-shadow .4s,color .4s;
+  border-bottom:1px solid transparent;
+  color:var(--hero-text);
 }
-#nav.solid{background:rgba(5,16,10,.95);backdrop-filter:blur(20px);border-color:var(--bd)}
-.nav-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
-.nav-brand-name{font-family:var(--f-label);font-size:1.4rem;letter-spacing:.12em;color:#fff}
+#nav.solid{
+  background:rgba(245,240,232,.96);backdrop-filter:blur(20px);
+  border-color:var(--bd);box-shadow:0 1px 0 var(--bd);
+  color:var(--text);
+}
+.nav-brand{display:flex;align-items:center;cursor:pointer}
+.nav-brand-name{font-family:var(--f-label);font-size:1.4rem;letter-spacing:.12em;transition:color .3s}
 .nav-brand-name sup{font-size:.5em;vertical-align:super}
-/* center links: absolute centered */
 .nav-center{
-  display:flex;gap:32px;align-items:center;
+  display:flex;gap:28px;align-items:center;
   position:absolute;left:50%;transform:translateX(-50%);
   white-space:nowrap;
 }
 .nav-center>li>a{
-  font-family:var(--f-sans);font-size:.76rem;letter-spacing:.08em;
-  color:rgba(255,255,255,.6);padding:4px 0;
-  border-bottom:1px solid transparent;
-  transition:color .2s,border-color .2s;
+  font-family:var(--f-sans);font-size:.74rem;letter-spacing:.08em;
+  opacity:.7;padding:4px 0;border-bottom:1px solid transparent;
+  transition:opacity .2s,border-color .2s;
 }
-.nav-center>li>a:hover{color:#fff;border-color:var(--gold)}
-/* dropdown */
+.nav-center>li>a:hover{opacity:1;border-color:var(--gold)}
 .has-drop{position:relative}
 .drop{
-  position:absolute;top:calc(100% + 20px);left:50%;
-  transform:translateX(-50%) translateY(-8px);
-  min-width:290px;background:rgba(13,26,15,.98);border:1px solid var(--bd);
-  border-radius:4px;padding:12px;
+  position:absolute;top:calc(100% + 16px);left:50%;
+  transform:translateX(-50%) translateY(-6px);
+  min-width:280px;background:#fff;border:1px solid var(--bd);
+  border-radius:6px;padding:10px;box-shadow:0 8px 40px rgba(0,0,0,.1);
   opacity:0;visibility:hidden;
-  transition:opacity .25s,visibility .25s,transform .25s;
+  transition:opacity .22s,visibility .22s,transform .22s;
 }
 .has-drop:hover .drop{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
-.drop-item{
-  display:flex;gap:14px;align-items:center;
-  padding:10px 14px;border-radius:3px;color:#fff;transition:background .2s;
-}
-.drop-item:hover{background:rgba(255,255,255,.06)}
-.drop-thumb{
-  width:44px;height:44px;border-radius:3px;flex-shrink:0;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-}
-.drop-thumb svg{width:36px;height:36px}
-.drop-item strong{display:block;font-family:var(--f-serif);font-size:.86rem;font-weight:700}
-.drop-item em{display:block;font-size:.65rem;color:rgba(255,255,255,.42);font-style:normal;margin-top:2px}
-.drop-more{padding:8px 14px;font-family:var(--f-label);font-size:.7rem;color:rgba(255,255,255,.28);font-style:italic}
-/* right */
+.drop-item{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:4px;color:var(--text);transition:background .2s}
+.drop-item:hover{background:var(--bg2)}
+.drop-thumb{width:46px;height:46px;border-radius:4px;flex-shrink:0;overflow:hidden}
+.drop-thumb img{width:100%;height:100%;object-fit:cover}
+.drop-item strong{display:block;font-family:var(--f-serif);font-size:.84rem;font-weight:700}
+.drop-item em{display:block;font-size:.64rem;color:var(--muted);font-style:normal;margin-top:2px}
+.drop-more{padding:8px 12px;font-family:var(--f-label);font-size:.7rem;color:var(--sub);font-style:italic}
 .nav-right{display:flex;align-items:center;gap:14px}
 .nav-cart{
-  position:relative;display:flex;align-items:center;gap:7px;
+  position:relative;display:flex;align-items:center;gap:6px;
   font-family:var(--f-sans);font-size:.72rem;letter-spacing:.06em;
-  color:rgba(255,255,255,.6);transition:color .2s;
-  padding:6px 0;
+  opacity:.7;transition:opacity .2s,color .2s;padding:6px 0;
 }
-.nav-cart:hover{color:var(--gold)}
+.nav-cart:hover{opacity:1;color:var(--gold)}
 #cart-badge{
   position:absolute;top:-6px;right:-8px;
   width:16px;height:16px;border-radius:50%;background:var(--berry);
@@ -140,352 +133,556 @@ ul,ol{list-style:none}
 #cart-badge.bump{animation:cbump .35s var(--ease)}
 @keyframes cbump{0%,100%{transform:scale(1)}50%{transform:scale(1.6)}}
 .nav-cta-btn{
-  padding:8px 20px;border:1px solid rgba(255,255,255,.28);border-radius:2px;
-  font-family:var(--f-sans);font-size:.74rem;letter-spacing:.1em;
-  color:rgba(255,255,255,.72);transition:border-color .2s,color .2s,background .2s;
+  padding:8px 18px;border:1px solid rgba(255,255,255,.3);
+  font-family:var(--f-sans);font-size:.73rem;letter-spacing:.09em;
+  opacity:.8;transition:border-color .2s,opacity .2s,background .2s,color .2s;
 }
-.nav-cta-btn:hover{border-color:var(--gold);color:var(--gold)}
-/* hamburger */
-.nav-hamburger{display:none;flex-direction:column;gap:5px;padding:8px}
-.nav-hamburger span{display:block;width:22px;height:1px;background:#fff;transition:transform .3s,opacity .3s}
-#mobile-menu{
-  display:none;position:fixed;inset:0;top:var(--nav-h);z-index:190;
-  background:rgba(5,16,10,.97);padding:32px;
-  flex-direction:column;gap:24px;
-}
-#mobile-menu.open{display:flex}
-#mobile-menu a{font-family:var(--f-sans);font-size:1rem;letter-spacing:.1em;color:rgba(255,255,255,.7);padding:12px 0;border-bottom:1px solid var(--bd)}
+#nav.solid .nav-cta-btn{border-color:var(--bd)}
+.nav-cta-btn:hover{border-color:var(--gold);color:var(--gold);opacity:1}
+.nav-hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;padding:8px;width:40px;height:40px}
+.nav-hamburger span{display:block;height:1px;background:currentColor;transition:transform .3s,opacity .3s,width .3s}
+.nav-hamburger span:nth-child(2){width:70%}
+.nav-hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+.nav-hamburger.open span:nth-child(2){opacity:0;width:0}
+.nav-hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
 
-/* ══ HERO ══ */
-.hero{
-  position:relative;height:100vh;min-height:680px;
-  overflow:hidden;background:var(--hero-bg);
+/* ══ FULLSCREEN MOBILE MENU ══ */
+#mobile-menu{
+  position:fixed;inset:0;z-index:180;
+  background:var(--hero-bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;
 }
-/* full-screen canvas */
-#hero-canvas{
-  position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;
+#mobile-menu.open{opacity:1;visibility:visible}
+.mm-close{
+  position:absolute;top:24px;right:24px;
+  width:44px;height:44px;display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.4);font-size:1.2rem;transition:color .2s;
 }
-/* dark gradient over canvas so text is readable */
-.hero-overlay{
-  position:absolute;inset:0;z-index:2;pointer-events:none;
-  background:
-    linear-gradient(to right, rgba(5,16,10,.75) 35%, transparent 100%),
-    linear-gradient(to top, rgba(5,16,10,.6) 0%, transparent 50%);
+.mm-close:hover{color:#fff}
+.mm-label{
+  font-family:var(--f-label);font-size:.7rem;letter-spacing:.3em;
+  color:rgba(255,255,255,.22);text-transform:uppercase;
+  margin-bottom:24px;
+  opacity:0;transform:translateY(16px);transition:opacity .4s,transform .4s;
 }
-/* text: bottom-left */
-.hero-content{
-  position:absolute;bottom:10%;left:6%;z-index:3;max-width:660px;
+#mobile-menu.open .mm-label{opacity:1;transform:translateY(0);transition-delay:.04s}
+.mm-item{
+  font-family:var(--f-serif);font-size:1.6rem;font-weight:900;
+  color:rgba(234,228,214,.85);letter-spacing:.02em;
+  padding:14px 48px;width:100%;text-align:center;
+  border-bottom:1px solid var(--bd-hero);
+  opacity:0;transform:translateY(20px);
+  transition:opacity .4s var(--ease-out),transform .4s var(--ease-out),color .2s;
 }
-.hero-eyebrow{
-  font-family:var(--f-label);font-size:.72rem;letter-spacing:.42em;color:var(--gold);
-  text-transform:uppercase;margin-bottom:22px;
-  display:flex;align-items:center;gap:16px;
-  opacity:0;animation:fadeIn .8s ease 1.8s forwards;
+.mm-item:first-of-type{border-top:1px solid var(--bd-hero)}
+#mobile-menu.open .mm-item{opacity:1;transform:translateY(0)}
+#mobile-menu.open .mm-item:nth-of-type(1){transition-delay:.06s}
+#mobile-menu.open .mm-item:nth-of-type(2){transition-delay:.1s}
+#mobile-menu.open .mm-item:nth-of-type(3){transition-delay:.14s}
+#mobile-menu.open .mm-item:nth-of-type(4){transition-delay:.18s}
+.mm-item:hover{color:var(--gold)}
+
+/* ══ FLASH ANIMATION (endangeredveggies 再現) ══ */
+@keyframes flash{
+  0%{opacity:0;animation-timing-function:cubic-bezier(.33,1,.68,1)}
+  4%{opacity:1}
+  8%{opacity:0}
+  12%{opacity:1}
+  100%{opacity:0}
 }
-.hero-eyebrow::before{content:'';display:block;width:36px;height:1px;background:var(--gold)}
-.hero-h1{
-  font-family:var(--f-serif);font-weight:900;
-  font-size:clamp(3.2rem,6.5vw,6rem);
-  line-height:1.06;letter-spacing:-.02em;color:var(--text-hero);margin-bottom:24px;
-}
-.hero-line{overflow:hidden}
-.hero-line-in{
-  display:block;transform:translateY(105%);
-  animation:lineUp 1s cubic-bezier(.16,1,.3,1) var(--d,0s) forwards;
+@keyframes flashIn{
+  0%{opacity:0}
+  6%{opacity:1}
+  100%{opacity:1}
 }
 @keyframes lineUp{to{transform:translateY(0)}}
-@keyframes fadeIn{to{opacity:1}}
-.hero-h1 em{font-style:normal;color:var(--gold)}
-.hero-body{
-  font-family:var(--f-sans);font-weight:300;font-size:.88rem;line-height:2.3;
-  color:rgba(234,228,214,.55);letter-spacing:.04em;margin-bottom:36px;
-  opacity:0;animation:fadeIn .8s ease 1.4s forwards;
+@keyframes fadeUp{0%{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scrollDrop{0%{transform:scaleY(0);opacity:0}35%{opacity:1}100%{transform:scaleY(1);opacity:0}}
+
+/* ══ HERO SCROLL SEQUENCE ══ */
+#hero-wrapper{position:relative;background:#000}
+#hero-scroll-space{/* height set by JS */}
+#hero-sticky{
+  position:sticky;top:0;height:100vh;overflow:hidden;
+  background:#000;display:flex;align-items:center;justify-content:center;
 }
-.hero-cta{display:flex;gap:14px;flex-wrap:wrap;opacity:0;animation:fadeIn .8s ease 1.6s forwards}
+/* 写真スロット: 中央正方形 (endangeredveggies スタイル) */
+.seq-slide{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .55s ease;
+  pointer-events:none;
+}
+.seq-slide.active{opacity:1;pointer-events:auto}
+.seq-slide-img{
+  width:min(52vw,72vh);height:min(52vw,72vh);
+  object-fit:cover;display:block;
+  /* 微妙なスケール感 */
+  transform:scale(1.04);
+  transition:transform 8s ease;
+}
+.seq-slide.active .seq-slide-img{transform:scale(1)}
+
+/* ボトムライン (endangeredveggies の特徴的な横線) */
+.seq-bottom-line{
+  position:absolute;
+  bottom:calc(50% - min(26vw,36vh) - 32px);
+  left:50%;transform:translateX(-50%);
+  width:min(52vw,72vh);height:1px;
+  background:rgba(255,255,255,.35);
+  transform-origin:left;
+  animation:lineExpand 1.2s var(--ease-out) 1.6s both;
+}
+@keyframes lineExpand{0%{transform:translateX(-50%) scaleX(0)}to{transform:translateX(-50%) scaleX(1)}}
+
+/* カウンター */
+.seq-counter{
+  position:absolute;bottom:32px;right:40px;
+  font-family:var(--f-label);font-size:.82rem;letter-spacing:.18em;
+  color:rgba(255,255,255,.35);
+  transition:opacity .4s;
+}
+.seq-counter-cur{color:rgba(255,255,255,.75)}
+
+/* テキストオーバーレイ (左下: 農家名 + 産地) */
+.seq-text{
+  position:absolute;left:7%;bottom:18%;z-index:4;
+  pointer-events:none;
+}
+.seq-label{
+  font-family:var(--f-label);font-size:.72rem;letter-spacing:.38em;
+  color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:14px;
+  opacity:0;transition:opacity .5s ease .1s,transform .5s var(--ease-out) .1s;
+  transform:translateY(8px);
+}
+.seq-name{
+  font-family:var(--f-serif);font-weight:900;
+  font-size:clamp(2rem,4.5vw,4.2rem);
+  color:#fff;line-height:.95;letter-spacing:-.03em;
+  margin-bottom:14px;
+  opacity:0;transition:opacity .5s ease .18s,transform .5s var(--ease-out) .18s;
+  transform:translateY(12px);
+}
+.seq-sub{
+  font-family:var(--f-sans);font-size:.78rem;letter-spacing:.08em;
+  color:rgba(255,255,255,.45);
+  opacity:0;transition:opacity .5s ease .26s,transform .5s var(--ease-out) .26s;
+  transform:translateY(8px);
+}
+/* アクティブ時にテキスト表示 */
+.seq-slide.active .seq-label,
+.seq-slide.active .seq-name,
+.seq-slide.active .seq-sub{
+  opacity:1;transform:translateY(0);
+}
+
+/* スクロールヒント */
+.seq-scroll-hint{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  z-index:5;display:flex;flex-direction:column;align-items:center;gap:8px;padding-bottom:6px;
+  opacity:0;animation:fadeUp .8s var(--ease-out) 2.4s forwards;
+}
+.seq-scroll-line{
+  width:1px;height:56px;
+  background:linear-gradient(to bottom,rgba(255,255,255,.45),transparent);
+  transform-origin:top;animation:scrollDrop 2.4s ease-in-out 3s infinite;
+}
+.seq-scroll-txt{font-family:var(--f-label);font-size:.5rem;letter-spacing:.35em;color:rgba(255,255,255,.2);text-transform:uppercase}
+
+/* ── CTA フレーム (最終フレーム) ── */
+.seq-cta-frame{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:center;
+  padding:0 8%;
+  opacity:0;transition:opacity .7s ease;
+  pointer-events:none;
+}
+.seq-cta-frame.active{opacity:1;pointer-events:auto}
+.seq-cta-eyebrow{
+  font-family:var(--f-label);font-size:.72rem;letter-spacing:.42em;color:var(--gold);
+  text-transform:uppercase;margin-bottom:22px;
+  display:flex;align-items:center;gap:14px;
+}
+.seq-cta-eyebrow::before{content:'';display:block;width:30px;height:1px;background:var(--gold);flex-shrink:0}
+.seq-cta-h1{
+  font-family:var(--f-serif);font-weight:900;
+  font-size:clamp(3rem,6.5vw,5.8rem);
+  line-height:1.04;letter-spacing:-.02em;color:#fff;margin-bottom:24px;
+}
+.seq-cta-h1 em{font-style:normal;color:var(--gold)}
+.seq-cta-body{
+  font-family:var(--f-sans);font-weight:300;font-size:.88rem;line-height:2.3;
+  color:var(--hero-sub);letter-spacing:.04em;max-width:480px;margin-bottom:36px;
+}
+.seq-cta-btns{display:flex;gap:12px;flex-wrap:wrap}
 .btn-primary{
-  padding:13px 30px;background:var(--gold);color:#05100A;
-  font-family:var(--f-sans);font-size:.8rem;font-weight:700;letter-spacing:.12em;border-radius:2px;
-  transition:background .2s,transform .2s;
+  padding:13px 28px;background:var(--gold);color:#05100A;
+  font-family:var(--f-sans);font-size:.78rem;font-weight:700;letter-spacing:.1em;
+  transition:background .2s,transform .15s;
 }
 .btn-primary:hover{background:var(--gold2);transform:translateY(-2px)}
 .btn-ghost{
-  padding:13px 26px;border:1px solid rgba(255,255,255,.25);
-  color:rgba(255,255,255,.7);font-family:var(--f-sans);font-size:.8rem;
-  letter-spacing:.12em;border-radius:2px;
+  padding:13px 24px;border:1px solid rgba(255,255,255,.3);
+  color:rgba(255,255,255,.75);font-family:var(--f-sans);font-size:.78rem;letter-spacing:.1em;
   transition:border-color .2s,color .2s;
 }
-.btn-ghost:hover{border-color:rgba(255,255,255,.6);color:#fff}
-/* right-bottom credit */
-.hero-credit{
-  position:absolute;right:3%;bottom:4%;z-index:3;
-  font-family:var(--f-label);font-size:.58rem;letter-spacing:.18em;
-  color:rgba(255,255,255,.22);writing-mode:vertical-rl;text-orientation:mixed;
+.btn-ghost:hover{border-color:rgba(255,255,255,.7);color:#fff}
+
+/* ══ FLOATING SECTION (宇宙浮遊トランジション) ══ */
+.float-section{
+  position:relative;height:100vh;background:#000;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
 }
-/* scroll indicator: center bottom */
-.hero-scroll-indicator{
-  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
-  z-index:3;display:flex;flex-direction:column;align-items:center;gap:8px;
-  padding-bottom:4px;
-  opacity:0;animation:fadeIn .8s ease 2s forwards;
+.float-section::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(196,154,48,.04) 0%,transparent 70%);
 }
-.scroll-line{
-  width:1px;height:64px;
-  background:linear-gradient(to bottom,rgba(255,255,255,.4),transparent);
-  transform-origin:top;animation:scrollDrop 2.2s ease-in-out infinite;
+.floater{
+  position:absolute;will-change:transform;
+  user-select:none;pointer-events:none;
 }
-@keyframes scrollDrop{
-  0%{transform:scaleY(0);opacity:0}30%{opacity:1}100%{transform:scaleY(1);opacity:0}
+.floater img{
+  display:block;
+  filter:drop-shadow(0 20px 60px rgba(0,0,0,.6));
 }
-.scroll-text{font-family:var(--f-label);font-size:.5rem;letter-spacing:.35em;color:rgba(255,255,255,.25);text-transform:uppercase}
+/* フラッシュテキスト (中央) */
+.float-flash-text{
+  position:relative;z-index:4;text-align:center;
+  opacity:0;transition:opacity .6s ease;
+}
+.float-section.vis .float-flash-text{
+  animation:flashIn 1.2s ease forwards;
+}
+.fft-en{
+  font-family:var(--f-label);font-size:.76rem;letter-spacing:.42em;
+  color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:20px;
+  display:block;
+}
+.fft-ja{
+  font-family:var(--f-serif);font-weight:900;
+  font-size:clamp(1.8rem,3.5vw,3.2rem);
+  color:#fff;line-height:1.3;letter-spacing:-.01em;display:block;
+}
+.fft-ja em{font-style:normal;color:var(--gold)}
 
 /* ══ STATEMENT ══ */
-.statement{background:var(--light-bg);padding:128px 0;text-align:center}
-.statement-inner{max-width:700px;margin:0 auto;padding:0 40px}
-.sec-eyebrow{font-family:var(--f-label);font-size:.8rem;letter-spacing:.3em;color:var(--text-muted);margin-bottom:24px}
-.statement-h{font-family:var(--f-serif);font-size:clamp(1.7rem,3vw,2.5rem);font-weight:900;color:var(--text-body);line-height:1.4;letter-spacing:-.01em;margin-bottom:24px}
-.statement-body{font-family:var(--f-sans);font-size:.9rem;line-height:2.3;color:var(--text-muted)}
+.statement{background:var(--bg);padding:120px 0;text-align:center}
+.statement-inner{max-width:680px;margin:0 auto;padding:0 40px}
+.sec-eyebrow{font-family:var(--f-label);font-size:.82rem;letter-spacing:.3em;color:var(--sub)}
+.statement-h{font-family:var(--f-serif);font-size:clamp(1.6rem,2.8vw,2.3rem);font-weight:900;color:var(--text);line-height:1.45;letter-spacing:-.01em;margin:20px 0}
+.statement-body{font-family:var(--f-sans);font-size:.88rem;line-height:2.4;color:var(--muted)}
 
 /* ══ FARMER TABS ══ */
 .farmer-tabs{
   position:sticky;top:var(--nav-h);z-index:80;
-  background:rgba(13,26,15,.95);backdrop-filter:blur(14px);
+  background:rgba(245,240,232,.95);backdrop-filter:blur(14px);
   border-bottom:1px solid var(--bd);
 }
-.farmer-tabs-scroll{
-  display:flex;overflow-x:auto;scrollbar-width:none;
-  padding:0 32px;
-}
+.farmer-tabs-scroll{display:flex;overflow-x:auto;scrollbar-width:none;padding:0 40px}
 .farmer-tabs-scroll::-webkit-scrollbar{display:none}
 .ftab{
-  flex-shrink:0;padding:16px 20px;
-  font-family:var(--f-sans);font-size:.72rem;letter-spacing:.09em;color:var(--text-sub);
+  flex-shrink:0;padding:16px 22px;
+  font-family:var(--f-sans);font-size:.72rem;letter-spacing:.09em;color:var(--muted);
   border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;
-  transition:color .2s,border-color .2s;
+  transition:color .2s,border-color .2s;white-space:nowrap;
 }
-.ftab:hover{color:var(--text-hero)}
+.ftab:hover{color:var(--text)}
 .ftab.on{color:var(--gold);border-color:var(--gold)}
 
-/* ══ FARMER SECTION ══ */
+/* ══ FARMER SECTION — broken grid 58/42 ══ */
 /* A: header */
-.farmer-header{
-  min-height:88vh;background:var(--dark);display:grid;grid-template-columns:1fr 1fr;
-  align-items:center;overflow:hidden;position:relative;
+.farmer-header{display:grid;grid-template-columns:58fr 42fr;min-height:82vh;overflow:hidden}
+.farmer-section:nth-child(even) .farmer-header{grid-template-columns:42fr 58fr}
+.farmer-section:nth-child(even) .fh-photo{order:2}
+.farmer-section:nth-child(even) .fh-text{order:1}
+.fh-photo{position:relative;overflow:hidden;background:var(--bg3)}
+/* ■ 写真差し替えポイント: farmer header — src を各農家の写真URLに変更 */
+.fh-photo img{width:100%;height:100%;object-fit:cover;transition:transform 7s ease}
+.fh-photo:hover img{transform:scale(1.04)}
+.fh-text{
+  background:var(--bg2);padding:80px 64px;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;
 }
-.farmer-header::before{
-  content:'';position:absolute;inset:0;
-  background:var(--fgrad,linear-gradient(135deg,#0D1A0F,#152018));opacity:.55;
+.fh-divider{
+  position:absolute;top:18%;bottom:18%;width:1px;background:var(--bdh);
+  left:0;
 }
-.farmer-header-text{padding:100px 64px;position:relative;z-index:2}
-.farmer-region{font-family:var(--f-label);font-size:.8rem;letter-spacing:.25em;color:var(--text-sub);margin-bottom:20px}
+.farmer-section:nth-child(even) .fh-divider{left:auto;right:0}
+.farmer-region{
+  font-family:var(--f-label);font-size:.82rem;letter-spacing:.26em;color:var(--sub);
+  margin-bottom:20px;display:flex;align-items:center;gap:10px;
+}
+.farmer-region::before{content:'';display:block;width:22px;height:1px;background:var(--gold);flex-shrink:0}
 .farmer-name-huge{
   font-family:var(--f-serif);font-weight:900;
-  font-size:clamp(3rem,9vw,8rem);line-height:.95;
-  color:var(--text-hero);letter-spacing:-.03em;margin-bottom:22px;
+  font-size:clamp(2.4rem,6.5vw,6rem);
+  line-height:.9;color:var(--text);letter-spacing:-.04em;margin-bottom:24px;
 }
-.farmer-tagline{font-family:var(--f-sans);font-size:.88rem;line-height:2;color:var(--text-sub);max-width:380px}
-.farmer-header-vis{position:relative;z-index:2;display:flex;align-items:center;justify-content:center}
-.farmer-header-vis svg{width:clamp(180px,26vw,360px);height:auto;opacity:.85;filter:drop-shadow(0 24px 70px rgba(0,0,0,.55))}
+.farmer-tagline{font-family:var(--f-sans);font-size:.86rem;line-height:2.1;color:var(--muted);max-width:340px}
+.farmer-since{margin-top:32px;font-family:var(--f-label);font-size:.78rem;letter-spacing:.16em;color:var(--sub)}
+
 /* B: story */
-.farmer-story{background:var(--light-bg);padding:96px 0}
-.farmer-story-inner{max-width:660px;margin:0 auto;padding:0 40px}
-.story-eyebrow{font-family:var(--f-label);font-size:.8rem;letter-spacing:.28em;color:var(--text-muted);margin-bottom:28px}
-.story-para{font-family:var(--f-sans);font-size:.9rem;line-height:2.4;color:var(--text-muted);margin-bottom:18px}
+.farmer-story{background:var(--bg);padding:88px 0}
+.farmer-story-inner{max-width:640px;margin:0 auto;padding:0 40px}
+.story-eyebrow{font-family:var(--f-label);font-size:.82rem;letter-spacing:.28em;color:var(--sub);margin-bottom:28px}
+.story-para{font-family:var(--f-sans);font-size:.88rem;line-height:2.5;color:var(--muted);margin-bottom:14px}
+/* story photos (2枚ブロークングリッド) */
+.story-photos{display:grid;grid-template-columns:58fr 42fr;gap:8px;margin:44px -40px}
+.story-photo{overflow:hidden;position:relative}
+/* ■ 写真差し替えポイント: story section photos */
+.story-photo img{width:100%;height:260px;object-fit:cover;transition:transform 7s ease}
+.story-photo:hover img{transform:scale(1.04)}
+
 /* C: stats */
-.farmer-stats{background:var(--dark2);padding:72px 0;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd)}
-.farmer-stats-inner{max-width:860px;margin:0 auto;padding:0 40px;display:grid;grid-template-columns:repeat(3,1fr)}
-.stat-item{padding:0 32px;text-align:center;border-right:1px solid var(--bd)}
+.farmer-stats{background:var(--bg3);padding:64px 0;border-top:1px solid var(--bd);border-bottom:1px solid var(--bd)}
+.farmer-stats-inner{max-width:820px;margin:0 auto;padding:0 40px;display:grid;grid-template-columns:repeat(3,1fr)}
+.stat-item{padding:0 28px;text-align:center;border-right:1px solid var(--bd)}
 .stat-item:last-child{border-right:none}
-.stat-num{font-family:var(--f-label);font-size:clamp(2.5rem,5vw,4rem);color:var(--gold);line-height:1}
-.stat-unit{font-family:var(--f-sans);font-size:.62rem;letter-spacing:.12em;color:var(--text-sub);margin-top:4px}
-.stat-label{font-family:var(--f-sans);font-size:.68rem;color:rgba(234,228,214,.35);margin-top:10px;letter-spacing:.06em}
+.stat-num{font-family:var(--f-label);font-size:clamp(2.2rem,4vw,3.6rem);color:var(--gold);line-height:1}
+.stat-unit{font-family:var(--f-sans);font-size:.62rem;letter-spacing:.12em;color:var(--muted);margin-top:4px}
+.stat-label{font-family:var(--f-sans);font-size:.68rem;color:var(--sub);margin-top:10px;letter-spacing:.06em}
+
 /* D: products */
-.farmer-products{background:var(--light-bg);padding:80px 0}
-.farmer-products-inner{max-width:1100px;margin:0 auto;padding:0 48px}
-.products-eyebrow{font-family:var(--f-label);font-size:.8rem;letter-spacing:.28em;color:var(--text-muted);margin-bottom:32px}
-.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.farmer-products{background:var(--bg);padding:72px 0}
+.farmer-products-inner{max-width:1080px;margin:0 auto;padding:0 48px}
+.products-eyebrow{font-family:var(--f-label);font-size:.82rem;letter-spacing:.28em;color:var(--sub);margin-bottom:28px}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+
 /* E: band */
-.farmer-band{background:var(--gold);padding:52px 48px;text-align:center}
-.band-quote{
-  font-family:var(--f-serif);font-size:clamp(1.1rem,2.2vw,1.7rem);
-  font-weight:700;color:#05100A;line-height:1.7;
-}
+.farmer-band{background:var(--gold);padding:48px;text-align:center}
+.band-quote{font-family:var(--f-serif);font-size:clamp(1rem,2vw,1.6rem);font-weight:700;color:#05100A;line-height:1.8}
 .band-quote::before{content:'"\2009';opacity:.5}
 .band-quote::after{content:'\2009"';opacity:.5}
 
 /* ══ PRODUCT CARD ══ */
-.pcard{background:#fff;border:1px solid var(--bdl);cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s}
-.pcard:hover{transform:translateY(-4px);box-shadow:0 12px 44px rgba(28,22,10,.13)}
-.pcard-img{height:190px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
-.pcard-img svg{width:130px;height:130px;transition:transform .4s var(--ease)}
-.pcard:hover .pcard-img svg{transform:scale(1.06)}
+.pcard{background:#fff;border:1px solid var(--bd);cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s,border-color .3s}
+.pcard:hover{transform:translateY(-4px);box-shadow:0 12px 48px rgba(28,22,10,.09);border-color:var(--bdh)}
+.pcard-img{height:200px;overflow:hidden;position:relative;background:var(--bg2)}
+/* ■ 写真差し替えポイント: product card */
+.pcard-img img{width:100%;height:100%;object-fit:cover;transition:transform 7s ease}
+.pcard:hover .pcard-img img{transform:scale(1.04)}
 .pcard-body{padding:18px 18px 16px}
 .pcard-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
-.badge{font-family:var(--f-sans);font-size:.56rem;font-weight:700;letter-spacing:.06em;padding:3px 7px;border-radius:1px}
-.b-lim{background:rgba(163,44,64,.08);color:#A03040;border:1px solid rgba(163,44,64,.18)}
-.b-new{background:rgba(26,76,30,.06);color:#1A4C1E;border:1px solid rgba(26,76,30,.16)}
-.b-gift{background:rgba(196,154,48,.1);color:#8A6010;border:1px solid rgba(196,154,48,.2)}
-.b-season{background:rgba(26,76,30,.06);color:#1A4C1E;border:1px solid rgba(26,76,30,.12)}
-.pcard-name{font-size:.92rem;font-weight:700;line-height:1.45;color:var(--text-body);margin-bottom:14px}
+.badge{font-family:var(--f-sans);font-size:.56rem;font-weight:700;letter-spacing:.06em;padding:3px 7px}
+.b-lim{background:rgba(163,44,64,.08);color:#A03040;border:1px solid rgba(163,44,64,.2)}
+.b-new{background:rgba(26,76,30,.06);color:#1A4C1E;border:1px solid rgba(26,76,30,.18)}
+.b-gift{background:rgba(196,154,48,.1);color:#8A6010;border:1px solid rgba(196,154,48,.22)}
+.b-season{background:rgba(26,76,30,.06);color:#1A4C1E;border:1px solid rgba(26,76,30,.14)}
+.pcard-name{font-size:.9rem;font-weight:700;line-height:1.45;color:var(--text);margin-bottom:14px}
 .pcard-foot{display:flex;align-items:center;justify-content:space-between}
-.pcard-price{font-size:1.02rem;font-weight:800;color:var(--text-body)}
-.pcard-price small{font-size:.6rem;font-weight:400;color:var(--text-muted);margin-left:3px}
-.pcard-unit{font-size:.62rem;color:var(--text-muted);margin-top:2px}
-.pcard-add{width:30px;height:30px;border-radius:50%;border:1px solid var(--bdl);display:flex;align-items:center;justify-content:center;font-size:.9rem;color:var(--text-muted);transition:all .2s}
-.pcard-add:hover{background:#1A4C1E;border-color:#1A4C1E;color:#fff}
+.pcard-price{font-size:1rem;font-weight:800;color:var(--text)}
+.pcard-price small{font-size:.6rem;font-weight:400;color:var(--muted);margin-left:3px}
+.pcard-unit{font-size:.62rem;color:var(--muted);margin-top:2px}
+.pcard-add{width:32px;height:32px;border-radius:50%;border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:.9rem;color:var(--muted);transition:all .2s}
+.pcard-add:hover{background:var(--green);border-color:var(--green);color:#fff}
 .pcard-add:disabled{opacity:.3;cursor:not-allowed}
 
 /* ══ CALENDAR ══ */
-.calendar-section{background:var(--dark);padding:96px 0}
-.cal-inner{max-width:1100px;margin:0 auto;padding:0 48px}
-.section-h2{font-size:clamp(1.6rem,2.5vw,2.2rem);font-weight:900;color:var(--text-hero);margin-bottom:48px}
-.cal-wrap{overflow-x:auto}
-.cal-table{border-collapse:collapse;width:100%;min-width:740px}
-.cal-table th{padding:8px 6px;font-family:var(--f-sans);font-size:.6rem;font-weight:500;letter-spacing:.1em;color:var(--text-sub);text-align:center;border-bottom:1px solid var(--bd)}
+.calendar-section{background:var(--bg-dark);padding:96px 0;color:var(--hero-text)}
+.cal-inner{max-width:1080px;margin:0 auto;padding:0 48px}
+.section-h2{font-size:clamp(1.5rem,2.4vw,2rem);font-weight:900;margin-bottom:48px}
+.cal-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cal-table{border-collapse:collapse;width:100%;min-width:720px}
+.cal-table th{padding:8px 5px;font-family:var(--f-sans);font-size:.6rem;font-weight:500;letter-spacing:.1em;color:var(--hero-sub);text-align:center;border-bottom:1px solid var(--bd-hero)}
 .cal-table th.now{color:var(--gold)}
 .cal-table td{padding:10px 5px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)}
 .cal-table td.now{background:rgba(196,154,48,.05)}
-.cal-name{text-align:left!important;padding:10px 16px!important;font-size:.76rem;font-weight:700;color:var(--text-hero);white-space:nowrap}
-.cal-dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+.cal-name{text-align:left!important;padding:10px 14px!important;font-size:.76rem;font-weight:700;color:var(--hero-text);white-space:nowrap}
+.cal-dot{display:inline-block;width:9px;height:9px;border-radius:50%}
 .cal-dot.on{animation:dotpls 2.5s ease-in-out infinite}
-@keyframes dotpls{0%,100%{opacity:.65}50%{opacity:1;transform:scale(1.28)}}
+@keyframes dotpls{0%,100%{opacity:.6}50%{opacity:1;transform:scale(1.32)}}
 
-/* ══ JOIN CTA ══ */
-.join-section{background:var(--dark2);padding:120px 0;text-align:center;border-top:1px solid var(--bd)}
-.join-inner{max-width:600px;margin:0 auto;padding:0 40px}
-.join-h{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:900;color:var(--text-hero);margin-bottom:16px}
-.join-sub{font-family:var(--f-sans);font-size:.88rem;line-height:2.2;color:var(--text-sub);margin-bottom:40px}
+/* ══ MAP ══ */
+.map-section{background:var(--bg);padding:96px 0}
+.map-inner{max-width:1080px;margin:0 auto;padding:0 48px}
+.map-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.map-wrap{position:relative;display:flex;justify-content:center}
+#japan-svg{width:100%;max-width:440px}
+.map-pin{position:absolute;cursor:pointer;transform:translate(-50%,-100%);transition:transform .2s}
+.map-pin:hover{transform:translate(-50%,-100%) scale(1.2)}
+.map-pin-dot{width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.18);margin:0 auto}
+.map-pin-pulse{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(196,154,48,.25);
+  animation:pulse 2s ease-out infinite;
+}
+@keyframes pulse{0%{transform:translate(-50%,-50%) scale(0);opacity:1}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}
+.map-pin-label{
+  position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  background:#fff;border:1px solid var(--bd);padding:4px 9px;white-space:nowrap;
+  font-family:var(--f-sans);font-size:.6rem;color:var(--text);
+  box-shadow:0 2px 12px rgba(0,0,0,.08);
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.map-pin:hover .map-pin-label{opacity:1}
+.map-legend{list-style:none}
+.map-legend li{
+  display:flex;align-items:center;gap:14px;padding:16px 0;
+  border-bottom:1px solid var(--bd);cursor:pointer;transition:opacity .2s;
+}
+.map-legend li:last-child{border-bottom:none}
+.map-legend li:hover{opacity:.65}
+.ml-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ml-info{}
+.ml-name{font-size:.88rem;font-weight:700;color:var(--text)}
+.ml-loc{font-family:var(--f-sans);font-size:.68rem;color:var(--muted);margin-top:2px}
+
+/* ══ JOIN ══ */
+.join-section{background:var(--bg3);padding:112px 0;text-align:center;border-top:1px solid var(--bd)}
+.join-inner{max-width:560px;margin:0 auto;padding:0 40px}
+.join-h{font-size:clamp(1.8rem,3vw,2.6rem);font-weight:900;color:var(--text);margin-bottom:14px}
+.join-sub{font-family:var(--f-sans);font-size:.88rem;line-height:2.3;color:var(--muted);margin-bottom:40px}
 .btn-outline{
   display:inline-flex;align-items:center;gap:8px;
-  padding:14px 32px;border:1px solid var(--gold);color:var(--gold);
-  font-family:var(--f-sans);font-size:.8rem;font-weight:700;letter-spacing:.1em;border-radius:2px;
+  padding:13px 30px;border:1px solid var(--gold);color:var(--gold);
+  font-family:var(--f-sans);font-size:.78rem;font-weight:700;letter-spacing:.1em;
   transition:background .2s,color .2s;
 }
 .btn-outline:hover{background:var(--gold);color:#05100A}
 
 /* ══ FOOTER ══ */
-footer{background:var(--hero-bg);padding:72px 48px 40px;border-top:1px solid var(--bd)}
+footer{background:var(--bg-dark);color:var(--hero-text);padding:72px 48px 40px;border-top:1px solid var(--bd)}
 .footer-top{display:flex;justify-content:space-between;flex-wrap:wrap;gap:40px;margin-bottom:56px}
-.footer-logo-name{font-family:var(--f-label);font-weight:900;font-size:1.4rem;letter-spacing:.2em;color:var(--text-hero)}
-.footer-logo-sub{font-family:var(--f-label);font-size:.58rem;letter-spacing:.2em;color:var(--text-sub);margin-top:6px}
+.footer-logo-name{font-family:var(--f-label);font-weight:900;font-size:1.4rem;letter-spacing:.2em}
+.footer-logo-sub{font-family:var(--f-label);font-size:.58rem;letter-spacing:.2em;color:var(--hero-sub);margin-top:6px}
 .footer-links{display:flex;gap:48px;flex-wrap:wrap}
-.footer-group label{font-family:var(--f-sans);font-size:.55rem;font-weight:700;letter-spacing:.24em;color:rgba(234,228,214,.2);text-transform:uppercase;display:block;margin-bottom:14px}
-.footer-group a{display:block;font-family:var(--f-sans);font-size:.75rem;color:var(--text-sub);margin-bottom:9px;transition:color .2s;cursor:pointer}
-.footer-group a:hover{color:var(--text-hero)}
-.footer-btm{font-family:var(--f-sans);font-size:.62rem;color:rgba(234,228,214,.18);text-align:center;padding-top:28px;border-top:1px solid var(--bd)}
+.footer-group label{font-family:var(--f-sans);font-size:.54rem;font-weight:700;letter-spacing:.24em;color:rgba(234,228,214,.2);text-transform:uppercase;display:block;margin-bottom:14px}
+.footer-group a{display:block;font-family:var(--f-sans);font-size:.74rem;color:var(--hero-sub);margin-bottom:9px;transition:color .2s;cursor:pointer}
+.footer-group a:hover{color:var(--hero-text)}
+.footer-btm{font-family:var(--f-sans);font-size:.6rem;color:rgba(234,228,214,.18);text-align:center;padding-top:28px;border-top:1px solid var(--bd-hero)}
 
 /* ══ CART MODAL ══ */
-.modal-bg{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
+.modal-bg{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.42);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;visibility:hidden;transition:opacity .3s,visibility .3s}
 .modal-bg.open{opacity:1;visibility:visible}
-.cart-box{background:var(--dark2);border:1px solid var(--bd);width:100%;max-width:480px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(20px);transition:transform .3s var(--ease)}
+.cart-box{background:#fff;border:1px solid var(--bd);width:100%;max-width:460px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;transform:translateY(20px);transition:transform .3s var(--ease)}
 .modal-bg.open .cart-box{transform:translateY(0)}
 .cart-head{padding:20px 24px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
-.cart-title{font-size:.96rem;font-weight:700;color:var(--text-hero)}
-.cart-close{width:28px;height:28px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:.82rem;color:var(--text-sub);transition:background .2s}
-.cart-close:hover{background:rgba(255,255,255,.12)}
+.cart-title{font-size:.94rem;font-weight:700;color:var(--text)}
+.cart-close{width:28px;height:28px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:.8rem;color:var(--muted);transition:background .2s}
+.cart-close:hover{background:var(--bg3)}
 .cart-list{flex:1;overflow-y:auto;padding:16px 24px}
-.cart-empty{text-align:center;padding:40px;color:var(--text-sub);font-family:var(--f-sans);font-size:.84rem}
-.cart-row{display:flex;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--bd)}
-.cart-row-img{width:52px;height:52px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);background:var(--dark)}
-.cart-row-img svg{width:38px;height:38px}
-.cart-row-name{font-size:.8rem;font-weight:700;color:var(--text-hero);margin-bottom:3px}
-.cart-row-price{font-size:.72rem;color:var(--text-sub)}
-.cart-row-ctrl{display:flex;align-items:center;gap:8px;margin-left:auto}
-.cqb{width:22px;height:22px;border-radius:50%;border:1px solid var(--bd);background:var(--dark);font-size:.76rem;display:flex;align-items:center;justify-content:center;color:var(--text-sub);transition:background .2s}
-.cqb:hover{background:rgba(255,255,255,.1)}
-.cqn{font-size:.82rem;font-weight:700;color:var(--text-hero);min-width:18px;text-align:center}
+.cart-empty{text-align:center;padding:40px;color:var(--muted);font-family:var(--f-sans);font-size:.82rem}
+.cart-row{display:flex;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--bd)}
+.cart-row-img{width:54px;height:54px;flex-shrink:0;overflow:hidden;border:1px solid var(--bd);background:var(--bg2)}
+.cart-row-img img{width:100%;height:100%;object-fit:cover}
+.cart-row-name{font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.cart-row-price{font-size:.72rem;color:var(--muted)}
+.cart-row-ctrl{display:flex;align-items:center;gap:6px;margin-left:auto}
+.cqb{width:22px;height:22px;border-radius:50%;border:1px solid var(--bd);background:var(--bg2);font-size:.76rem;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:background .2s}
+.cqb:hover{background:var(--bg3)}
+.cqn{font-size:.82rem;font-weight:700;color:var(--text);min-width:18px;text-align:center}
 .cart-foot{padding:16px 24px;border-top:1px solid var(--bd)}
 .cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.cart-total-lbl{font-family:var(--f-sans);font-size:.78rem;color:var(--text-sub)}
-.cart-total-num{font-size:1.2rem;font-weight:800;color:var(--text-hero)}
-.checkout-btn{width:100%;padding:13px;background:var(--gold);color:#05100A;font-family:var(--f-sans);font-weight:700;font-size:.84rem;letter-spacing:.08em;border-radius:2px;transition:background .2s}
+.cart-total-lbl{font-family:var(--f-sans);font-size:.76rem;color:var(--muted)}
+.cart-total-num{font-size:1.2rem;font-weight:800;color:var(--text)}
+.checkout-btn{width:100%;padding:13px;background:var(--gold);color:#05100A;font-family:var(--f-sans);font-weight:700;font-size:.82rem;letter-spacing:.08em;transition:background .2s}
 .checkout-btn:hover{background:var(--gold2)}
 
 /* ══ PRODUCT DETAIL ══ */
-.detail-page{min-height:100vh;background:var(--hero-bg);padding-top:var(--nav-h)}
-.detail-hero{background:var(--dark);padding:72px 0;border-bottom:1px solid var(--bd)}
-.detail-hero-inner{max-width:1100px;margin:0 auto;padding:0 48px;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
-.detail-illus{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:4px;overflow:hidden}
-.detail-illus svg{width:65%;height:65%}
-.detail-bc{display:flex;gap:8px;align-items:center;font-family:var(--f-sans);font-size:.68rem;color:var(--text-sub);margin-bottom:24px}
+.detail-page{min-height:100vh;background:var(--bg);padding-top:var(--nav-h)}
+.detail-hero{background:var(--bg2);padding:72px 0;border-bottom:1px solid var(--bd)}
+.detail-hero-inner{max-width:1080px;margin:0 auto;padding:0 48px;display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+/* ■ 写真差し替えポイント: product detail */
+.detail-illus{aspect-ratio:1;overflow:hidden;background:var(--bg3)}
+.detail-illus img{width:100%;height:100%;object-fit:cover;transition:transform 7s ease}
+.detail-illus:hover img{transform:scale(1.04)}
+.detail-bc{display:flex;gap:8px;align-items:center;font-family:var(--f-sans);font-size:.68rem;color:var(--muted);margin-bottom:22px}
 .detail-bc a{cursor:pointer;transition:color .2s}
-.detail-bc a:hover{color:var(--text-hero)}
+.detail-bc a:hover{color:var(--text)}
 .detail-bc span{opacity:.4}
 .detail-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.detail-title{font-size:clamp(1.5rem,3vw,2.2rem);font-weight:900;line-height:1.2;color:var(--text-hero);margin-bottom:10px}
-.detail-origin{font-family:var(--f-sans);font-size:.78rem;color:var(--text-sub);margin-bottom:22px}
+.detail-title{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:900;line-height:1.2;color:var(--text);margin-bottom:10px}
+.detail-origin{font-family:var(--f-sans);font-size:.76rem;color:var(--muted);margin-bottom:20px}
 .detail-price{font-size:2rem;font-weight:900;color:var(--gold)}
-.detail-price small{font-size:.72rem;font-weight:400;color:var(--text-sub);margin-left:5px}
-.detail-unit{font-family:var(--f-sans);font-size:.78rem;color:var(--text-sub);margin-bottom:18px}
-.stock-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-sans);font-size:.72rem;font-weight:700;padding:5px 11px;border-radius:2px;margin-bottom:22px}
+.detail-price small{font-size:.7rem;font-weight:400;color:var(--muted);margin-left:5px}
+.detail-unit{font-family:var(--f-sans);font-size:.76rem;color:var(--muted);margin-bottom:18px}
+.stock-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-sans);font-size:.7rem;font-weight:700;padding:5px 10px;margin-bottom:22px}
 .stock-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
-.sb-in{background:rgba(46,107,40,.12);color:#3D8840}
-.sb-lim{background:rgba(163,44,64,.12);color:#A03040}
-.sb-out{background:rgba(255,255,255,.06);color:var(--text-sub)}
-.sb-pre{background:rgba(196,154,48,.12);color:var(--gold)}
-.detail-appeal{font-family:var(--f-sans);font-size:.84rem;line-height:2;color:var(--text-sub);padding:14px 16px;border-left:2px solid var(--gold);margin-bottom:24px}
-.season-bar-lbl{font-family:var(--f-sans);font-size:.7rem;color:var(--text-sub);margin-bottom:8px}
+.sb-in{background:rgba(46,107,40,.1);color:#3D8840}
+.sb-lim{background:rgba(163,44,64,.1);color:#A03040}
+.sb-out{background:rgba(0,0,0,.06);color:var(--muted)}
+.sb-pre{background:rgba(196,154,48,.1);color:var(--gold)}
+.detail-appeal{font-family:var(--f-sans);font-size:.84rem;line-height:2;color:var(--muted);padding:14px 16px;border-left:2px solid var(--gold);margin-bottom:24px}
+.season-bar-lbl{font-family:var(--f-sans);font-size:.7rem;color:var(--muted);margin-bottom:8px}
 .season-months{display:flex;gap:4px;margin-bottom:4px}
-.sm-bar{flex:1;height:4px;background:rgba(255,255,255,.1);border-radius:2px}
+.sm-bar{flex:1;height:4px;background:var(--bd);border-radius:2px}
 .sm-bar.on{background:var(--gold)}
 .sm-bar.now{outline:2px solid rgba(196,154,48,.5);outline-offset:2px}
 .sm-labels{display:flex;gap:4px;margin-bottom:22px}
-.sm-lbl{flex:1;text-align:center;font-family:var(--f-sans);font-size:.42rem;color:var(--text-sub)}
+.sm-lbl{flex:1;text-align:center;font-family:var(--f-sans);font-size:.42rem;color:var(--muted)}
 .qty-row{display:flex;align-items:center;gap:14px;margin-bottom:16px}
-.qty-lbl{font-family:var(--f-sans);font-size:.74rem;color:var(--text-sub)}
+.qty-lbl{font-family:var(--f-sans);font-size:.74rem;color:var(--muted)}
 .qty-ctrl{display:flex;align-items:center;border:1px solid var(--bd);overflow:hidden}
-.qbtn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--dark2);color:var(--text-sub);font-weight:700;transition:background .2s}
-.qbtn:hover{background:var(--dark)}
-.qnum{width:42px;height:34px;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--bd);border-right:1px solid var(--bd);font-weight:700;color:var(--text-hero)}
-.add-to-cart{width:100%;padding:14px;background:var(--gold);color:#05100A;font-family:var(--f-sans);font-size:.9rem;font-weight:700;letter-spacing:.08em;border-radius:2px;margin-bottom:14px;transition:background .2s,transform .2s}
+.qbtn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--bg2);color:var(--muted);font-weight:700;transition:background .2s}
+.qbtn:hover{background:var(--bg3)}
+.qnum{width:42px;height:34px;display:flex;align-items:center;justify-content:center;border-left:1px solid var(--bd);border-right:1px solid var(--bd);font-weight:700;color:var(--text)}
+.add-to-cart{width:100%;padding:14px;background:var(--gold);color:#05100A;font-family:var(--f-sans);font-size:.88rem;font-weight:700;letter-spacing:.08em;margin-bottom:14px;transition:background .2s,transform .2s}
 .add-to-cart:hover{background:var(--gold2);transform:translateY(-2px)}
 .add-to-cart:disabled{opacity:.35;transform:none;cursor:not-allowed}
-.detail-body{background:var(--light-bg);padding:72px 0}
-.detail-body-inner{max-width:1100px;margin:0 auto;padding:0 48px;display:grid;grid-template-columns:1fr 1fr;gap:64px}
-.detail-tabs{display:flex;border-bottom:1px solid var(--bdl);margin-bottom:20px}
-.dtab{padding:10px 16px;font-family:var(--f-sans);font-size:.74rem;font-weight:600;letter-spacing:.05em;color:var(--text-muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s}
-.dtab:hover{color:var(--text-body)}
-.dtab.on{color:#1A4C1E;border-color:#1A4C1E}
+.detail-body{background:var(--bg);padding:72px 0}
+.detail-body-inner{max-width:1080px;margin:0 auto;padding:0 48px;display:grid;grid-template-columns:1fr 1fr;gap:56px}
+.detail-tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:20px}
+.dtab{padding:10px 14px;font-family:var(--f-sans);font-size:.73rem;font-weight:600;letter-spacing:.05em;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s}
+.dtab:hover{color:var(--text)}
+.dtab.on{color:var(--green);border-color:var(--green)}
 .dtab-pane{display:none}
 .dtab-pane.on{display:block}
-.dtab-text{font-family:var(--f-sans);font-size:.84rem;line-height:2.1;color:var(--text-muted)}
-.spec-row{display:grid;grid-template-columns:90px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdl);font-family:var(--f-sans);font-size:.76rem}
-.spec-lbl{color:var(--text-muted);font-weight:600}
-.spec-val{color:var(--text-body)}
-.howto-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--cream);margin-bottom:6px;font-family:var(--f-sans);font-size:.76rem;color:var(--text-muted)}
-.howto-item::before{content:'◆';color:#1A4C1E;font-size:.4rem;flex-shrink:0}
-.dfc{padding:20px;border:1px solid var(--bdl);cursor:pointer;transition:border-color .2s;background:#fff}
-.dfc:hover{border-color:#1A4C1E}
-.dfc-top{display:flex;gap:14px;align-items:center;margin-bottom:10px}
-.dfc-illus{width:52px;height:52px;flex-shrink:0;border-radius:2px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-.dfc-illus svg{width:52px;height:52px}
-.dfc-name{font-size:.9rem;font-weight:700;color:var(--text-body);margin-bottom:2px}
-.dfc-pref{font-family:var(--f-sans);font-size:.68rem;color:var(--text-muted)}
-.dfc-catch{font-family:var(--f-sans);font-size:.78rem;color:var(--text-muted);line-height:1.9;font-style:italic}
+.dtab-text{font-family:var(--f-sans);font-size:.84rem;line-height:2.1;color:var(--muted)}
+.spec-row{display:grid;grid-template-columns:90px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd);font-family:var(--f-sans);font-size:.76rem}
+.spec-lbl{color:var(--muted);font-weight:600}
+.spec-val{color:var(--text)}
+.howto-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg2);margin-bottom:6px;font-family:var(--f-sans);font-size:.76rem;color:var(--muted)}
+.howto-item::before{content:'◆';color:var(--green);font-size:.4rem;flex-shrink:0}
+.dfc{padding:20px;border:1px solid var(--bd);cursor:pointer;transition:border-color .2s;background:#fff}
+.dfc:hover{border-color:var(--green)}
+.dfc-top{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.dfc-illus{width:52px;height:52px;flex-shrink:0;overflow:hidden}
+.dfc-illus img{width:100%;height:100%;object-fit:cover}
+.dfc-name{font-size:.9rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.dfc-pref{font-family:var(--f-sans);font-size:.68rem;color:var(--muted)}
+.dfc-catch{font-family:var(--f-sans);font-size:.78rem;color:var(--muted);line-height:1.9;font-style:italic}
 
 /* ══ REVEAL ══ */
-[data-reveal]{opacity:0;transition:opacity .85s var(--ease),transform .85s var(--ease)}
-[data-reveal]:not([data-dir]){transform:translateY(28px)}
-[data-reveal][data-dir=left]{transform:translateX(-46px)}
-[data-reveal][data-dir=right]{transform:translateX(46px)}
+[data-reveal]{opacity:0;transition:opacity .9s var(--ease),transform .9s var(--ease)}
+[data-reveal]:not([data-dir]){transform:translateY(22px)}
+[data-reveal][data-dir=left]{transform:translateX(-38px)}
+[data-reveal][data-dir=right]{transform:translateX(38px)}
 [data-reveal].vis{opacity:1;transform:translate(0)}
 
 /* ══ RESPONSIVE ══ */
-@media(max-width:960px){
-  .nav-center{display:none}
-  .nav-cta-btn{display:none}
+@media(max-width:900px){
+  .nav-center,.nav-cta-btn{display:none}
   .nav-hamburger{display:flex}
-  .hero-content{left:5%;max-width:90%}
-  .farmer-header{grid-template-columns:1fr;min-height:auto}
-  .farmer-header-text{padding:80px 28px 48px}
-  .farmer-header-vis{display:none}
-  .farmer-story-inner,.farmer-products-inner,.cal-inner,.join-inner{padding:0 24px}
-  .farmer-stats-inner{grid-template-columns:1fr;gap:0}
-  .stat-item{border-right:none;border-bottom:1px solid var(--bd);padding:24px 0;text-align:left}
+  #nav{padding:0 20px}
+  .farmer-header{grid-template-columns:1fr!important;min-height:auto}
+  .farmer-section:nth-child(even) .fh-photo,.farmer-section:nth-child(odd) .fh-photo{order:1}
+  .farmer-section:nth-child(even) .fh-text,.farmer-section:nth-child(odd) .fh-text{order:2}
+  .fh-photo{height:56vw}
+  .fh-text{padding:48px 24px}
+  .fh-divider{display:none}
+  .story-photos{grid-template-columns:1fr;margin:32px 0}
+  .story-photo img{height:200px}
+  .farmer-stats-inner{grid-template-columns:repeat(3,1fr)}
+  .farmer-story-inner,.farmer-products-inner{padding:0 24px}
+  .cal-inner,.map-inner,.join-inner{padding:0 24px}
+  .map-grid{grid-template-columns:1fr;gap:32px}
+  #japan-svg{max-width:300px;margin:0 auto}
   .detail-hero-inner,.detail-body-inner{grid-template-columns:1fr;padding:0 24px;gap:28px}
   .detail-illus{display:none}
+  .products-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
   footer{padding:48px 24px 32px}
+  .footer-links{gap:28px}
+  .hero-content{left:5%;max-width:92%}
   .farmer-tabs-scroll{padding:0 20px}
-  #nav{padding:0 20px}
+}
+@media(max-width:600px){
+  .products-grid{grid-template-columns:1fr 1fr}
+  .farmer-stats-inner{grid-template-columns:1fr}
+  .stat-item{border-right:none;border-bottom:1px solid var(--bd);padding:18px 0;text-align:left}
+  .stat-item:last-child{border-bottom:none}
 }
 </style>
 </head>
@@ -498,18 +695,28 @@ footer{background:var(--hero-bg);padding:72px 48px 40px;border-top:1px solid var
     <div class="loader-sub">Agricultural EC Platform</div>
     <div class="loader-spinner">
       <svg viewBox="0 0 50 50" width="44" height="44">
-        <circle cx="25" cy="25" r="20" fill="none" stroke="rgba(196,154,48,.2)" stroke-width="2"/>
+        <circle cx="25" cy="25" r="20" fill="none" stroke="rgba(196,154,48,.18)" stroke-width="2"/>
         <circle cx="25" cy="25" r="20" fill="none" stroke="#C49A30" stroke-width="2"
           stroke-dasharray="31.4 94.2" stroke-linecap="round"
           style="transform-origin:25px 25px;animation:spin 1.2s linear infinite"/>
       </svg>
     </div>
   </div>
-  <div class="loader-credit">Illustration by SEN Agricultural EC</div>
+  <div class="loader-credit">SEN Agricultural EC Platform</div>
 </div>
 
 <!-- GRAIN -->
 <div class="grain" aria-hidden="true"></div>
+
+<!-- FULLSCREEN MOBILE MENU -->
+<div id="mobile-menu">
+  <button class="mm-close" onclick="closeMobileMenu()">✕</button>
+  <div class="mm-label">Menu</div>
+  <a class="mm-item" href="#" onclick="scrollToId('statement');closeMobileMenu();return false">この取り組みについて</a>
+  <a class="mm-item" href="#" onclick="scrollToId('farmer-tabs');closeMobileMenu();return false">加盟農家</a>
+  <a class="mm-item" href="#" onclick="scrollToId('section-calendar');closeMobileMenu();return false">旬カレンダー</a>
+  <a class="mm-item" href="#" onclick="scrollToId('section-join');closeMobileMenu();return false">Partners</a>
+</div>
 
 <!-- NAV -->
 <nav id="nav">
@@ -527,7 +734,7 @@ footer{background:var(--hero-bg);padding:72px 48px 40px;border-top:1px solid var
   </ul>
   <div class="nav-right">
     <button class="nav-cart" onclick="openCart()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
       <span id="cart-badge">0</span>
     </button>
     <a class="nav-cta-btn" href="#" onclick="scrollToId('section-join');return false">パートナーになる</a>
@@ -536,13 +743,6 @@ footer{background:var(--hero-bg);padding:72px 48px 40px;border-top:1px solid var
     </button>
   </div>
 </nav>
-
-<!-- MOBILE MENU -->
-<div id="mobile-menu">
-  <a href="#" onclick="scrollToId('statement');closeMobileMenu();return false">この取り組みについて</a>
-  <a href="#" onclick="scrollToId('section-calendar');closeMobileMenu();return false">旬カレンダー</a>
-  <a href="#" onclick="scrollToId('section-join');closeMobileMenu();return false">Partners / 農家になる</a>
-</div>
 
 <!-- APP -->
 <main id="app"></main>
@@ -566,116 +766,126 @@ footer{background:var(--hero-bg);padding:72px 48px 40px;border-top:1px solid var
 </div>
 
 <script>
-/* ══════════════ SVG ══════════════ */
-const SVG={
-corn:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M60 130 Q50 90 70 50 Q80 30 90 45 Q75 75 80 130Z" fill="#1E5A22" stroke="#0a0a0a" stroke-width="2.5"/><path d="M140 130 Q150 90 130 50 Q120 30 110 45 Q125 75 120 130Z" fill="#2A6E2E" stroke="#0a0a0a" stroke-width="2.5"/><ellipse cx="100" cy="110" rx="32" ry="55" fill="#F5D060" stroke="#0a0a0a" stroke-width="3.5"/><g fill="#0a0a0a"><ellipse cx="90" cy="75" rx="4" ry="3"/><ellipse cx="100" cy="72" rx="4" ry="3"/><ellipse cx="110" cy="75" rx="4" ry="3"/><ellipse cx="85" cy="86" rx="4" ry="3"/><ellipse cx="95" cy="83" rx="4" ry="3"/><ellipse cx="105" cy="83" rx="4" ry="3"/><ellipse cx="115" cy="86" rx="4" ry="3"/><ellipse cx="82" cy="97" rx="4" ry="3"/><ellipse cx="92" cy="94" rx="4.5" ry="3"/><ellipse cx="100" cy="94" rx="4.5" ry="3"/><ellipse cx="108" cy="94" rx="4" ry="3"/><ellipse cx="118" cy="97" rx="4" ry="3"/><ellipse cx="83" cy="108" rx="4" ry="3"/><ellipse cx="93" cy="105" rx="4" ry="3"/><ellipse cx="100" cy="105" rx="4.5" ry="3"/><ellipse cx="107" cy="105" rx="4" ry="3"/><ellipse cx="117" cy="108" rx="4" ry="3"/><ellipse cx="85" cy="119" rx="4" ry="3"/><ellipse cx="95" cy="116" rx="4" ry="3"/><ellipse cx="105" cy="116" rx="4" ry="3"/><ellipse cx="115" cy="119" rx="4" ry="3"/><ellipse cx="88" cy="130" rx="4" ry="3"/><ellipse cx="100" cy="128" rx="4.5" ry="3"/><ellipse cx="112" cy="130" rx="4" ry="3"/><ellipse cx="93" cy="140" rx="4" ry="3"/><ellipse cx="107" cy="140" rx="4" ry="3"/><ellipse cx="100" cy="150" rx="4" ry="3"/></g></svg>`,
-strawberry:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 70 Q85 55 80 40 Q90 50 100 55 Q110 50 120 40 Q115 55 100 70Z" fill="#1E6A22" stroke="#0a0a0a" stroke-width="2.5"/><path d="M100 70 Q75 60 65 45 Q80 55 100 65Z" fill="#1E6A22" stroke="#0a0a0a" stroke-width="2"/><path d="M100 70 Q125 60 135 45 Q120 55 100 65Z" fill="#2A7E2E" stroke="#0a0a0a" stroke-width="2"/><path d="M100 75 Q70 80 65 110 Q60 140 100 165 Q140 140 135 110 Q130 80 100 75Z" fill="#C94A5E" stroke="#0a0a0a" stroke-width="3.5"/><g fill="#0a0a0a"><ellipse cx="88" cy="95" rx="3" ry="4" transform="rotate(-15 88 95)"/><ellipse cx="100" cy="90" rx="3" ry="4"/><ellipse cx="112" cy="95" rx="3" ry="4" transform="rotate(15 112 95)"/><ellipse cx="82" cy="110" rx="3" ry="4" transform="rotate(-20 82 110)"/><ellipse cx="94" cy="107" rx="3" ry="4"/><ellipse cx="106" cy="107" rx="3" ry="4"/><ellipse cx="118" cy="110" rx="3" ry="4" transform="rotate(20 118 110)"/><ellipse cx="85" cy="124" rx="3" ry="4" transform="rotate(-15 85 124)"/><ellipse cx="100" cy="122" rx="3" ry="4"/><ellipse cx="115" cy="124" rx="3" ry="4" transform="rotate(15 115 124)"/><ellipse cx="90" cy="138" rx="3" ry="4"/><ellipse cx="110" cy="138" rx="3" ry="4"/><ellipse cx="100" cy="150" rx="3" ry="4"/></g><path d="M78 92 Q74 115 80 134" stroke="rgba(255,255,255,.28)" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`,
-potato:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="105" rx="55" ry="42" fill="#C4A060" stroke="#0a0a0a" stroke-width="3.5" transform="rotate(-10 100 105)"/><g fill="#0a0a0a"><circle cx="75" cy="95" r="4"/><circle cx="115" cy="88" r="4"/><circle cx="100" cy="118" r="3.5"/></g><g fill="#8A6830"><circle cx="73" cy="92" r="2"/><circle cx="113" cy="85" r="2"/><circle cx="98" cy="115" r="2"/></g><ellipse cx="80" cy="88" rx="18" ry="12" fill="rgba(255,255,255,.12)" transform="rotate(-10 80 88)"/></svg>`,
-onion:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 55 Q98 40 95 25 M100 55 Q102 40 105 25" stroke="#2A6E2E" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M100 55 Q65 60 58 100 Q56 135 100 155 Q144 135 142 100 Q135 60 100 55Z" fill="#D4A8CC" stroke="#0a0a0a" stroke-width="3.5"/><path d="M100 65 Q72 72 68 105 Q68 130 100 145" stroke="#A87898" stroke-width="2" fill="none"/><path d="M100 65 Q128 72 132 105 Q132 130 100 145" stroke="#A87898" stroke-width="2" fill="none"/><ellipse cx="82" cy="90" rx="14" ry="22" fill="rgba(255,255,255,.15)" transform="rotate(-15 82 90)"/></svg>`,
-grape:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 35 Q100 50 100 60" stroke="#3A2818" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M100 44 Q115 35 125 25 Q112 42 100 40Z" fill="#2A6E22" stroke="#0a0a0a" stroke-width="1.5"/><circle cx="84" cy="80" r="16" fill="#6A3090" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="100" cy="76" r="16" fill="#7A3AA0" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="116" cy="80" r="16" fill="#6A3090" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="76" cy="106" r="16" fill="#7A3AA0" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="92" cy="102" r="16" fill="#6A3090" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="108" cy="102" r="16" fill="#7A3AA0" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="124" cy="106" r="16" fill="#6A3090" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="84" cy="130" r="16" fill="#6A3090" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="100" cy="128" r="16" fill="#7A3AA0" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="116" cy="130" r="16" fill="#6A3090" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="92" cy="154" r="15" fill="#7A3AA0" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="108" cy="154" r="15" fill="#6A3090" stroke="#0a0a0a" stroke-width="2.5"/><circle cx="100" cy="176" r="14" fill="#7A3AA0" stroke="#0a0a0a" stroke-width="2.5"/><g fill="rgba(255,255,255,.25)"><circle cx="92" cy="73" r="5"/><circle cx="108" cy="73" r="4"/></g></svg>`,
-peach:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 52 Q100 38 102 28" stroke="#3A2818" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M100 40 Q120 32 130 22 Q118 36 100 40Z" fill="#2A6E22" stroke="#0a0a0a" stroke-width="1.5"/><path d="M100 55 Q55 60 50 105 Q48 150 100 165 Q152 150 150 105 Q145 60 100 55Z" fill="#F0A058" stroke="#0a0a0a" stroke-width="3.5"/><ellipse cx="80" cy="88" rx="20" ry="14" fill="rgba(255,255,255,.2)" transform="rotate(-20 80 88)"/></svg>`,
-egg:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 40 Q55 48 50 105 Q48 155 100 168 Q152 155 150 105 Q145 48 100 40Z" fill="#F5EED8" stroke="#0a0a0a" stroke-width="3.5"/><g stroke="#C8B890" stroke-width="1" opacity=".4" fill="none"><path d="M72 75 Q68 90 70 105"/><path d="M128 75 Q132 90 130 105"/></g><ellipse cx="82" cy="82" rx="16" ry="24" fill="rgba(255,255,255,.4)" transform="rotate(-18 82 82)"/></svg>`,
-leaf:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 160 Q60 140 50 100 Q40 60 100 40 Q160 60 150 100 Q140 140 100 160Z" fill="#2A6A30" stroke="#0a0a0a" stroke-width="3"/><path d="M100 160 Q100 100 100 40" stroke="#0a0a0a" stroke-width="2" fill="none"/><path d="M100 80 Q80 75 70 65M100 80 Q120 75 130 65M100 105 Q78 100 68 93M100 105 Q122 100 132 93" stroke="#0a0a0a" stroke-width="1.5" fill="none"/></svg>`,
+/* ══ PHOTO MAP ══ */
+/* ■ 写真差し替えポイント: ここのURLを実写真に変更するだけで全箇所に反映 */
+const PHOTOS = {
+  farmers: {
+    'solato':          'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1400&q=80',
+    'yamamoto-farm':   'https://images.unsplash.com/photo-1560493676-04071c5f467b?w=1400&q=80',
+    'sunrise-orchard': 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1400&q=80',
+    'tanaka-farm':     'https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=1400&q=80',
+  },
+  /* story section: 農家ごとに2枚 */
+  story: {
+    'solato':          ['https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=900&q=80','https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900&q=80'],
+    'yamamoto-farm':   ['https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=900&q=80','https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900&q=80'],
+    'sunrise-orchard': ['https://images.unsplash.com/photo-1490750967868-88df5691cc8a?w=900&q=80','https://images.unsplash.com/photo-1553279768-865429fa0078?w=900&q=80'],
+    'tanaka-farm':     ['https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=900&q=80','https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=900&q=80'],
+  },
+  /* ■ 写真差し替えポイント: 商品写真 — illustrationType をキーに参照 */
+  products: {
+    corn:        'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=600&q=80',
+    strawberry:  'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=600&q=80',
+    potato:      'https://images.unsplash.com/photo-1508313880080-c4bef0730395?w=600&q=80',
+    onion:       'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&q=80',
+    grape:       'https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=600&q=80',
+    peach:       'https://images.unsplash.com/photo-1595475038784-bbe439ff41e6?w=600&q=80',
+    egg:         'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=600&q=80',
+    leaf:        'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&q=80',
+  },
 };
-function getIllus(type,size){return(SVG[type]||SVG.leaf)(size);}
-
-/* ══════════════ PARTICLES ══════════════ */
-function delay(ms){return new Promise(r=>setTimeout(r,ms));}
-
-class VegetableParticles{
-  constructor(el){
-    this.canvas=el;this.ctx=el.getContext('2d');
-    this.W=el.width;this.H=el.height;
-    this.dpr=window.devicePixelRatio||1;
-    this.particles=[];
-    this.vi=0;
-    this.keys=['corn','strawberry','potato','onion','grape','peach','egg'];
-    this.state='idle';this.frameId=null;this._stop=false;
-  }
-  async sampleSVG(str){
-    const size=Math.round(Math.min(this.W,this.H)*.55);
-    const blob=new Blob([str],{type:'image/svg+xml'});
-    const url=URL.createObjectURL(blob);
-    const img=new Image();
-    await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url;});
-    URL.revokeObjectURL(url);
-    const off=Object.assign(document.createElement('canvas'),{width:size,height:size});
-    const oc=off.getContext('2d');
-    oc.drawImage(img,0,0,size,size);
-    const data=oc.getImageData(0,0,size,size).data;
-    const pts=[];
-    const step=Math.max(3,Math.round(size/90));
-    const ox=(this.W-size)/2,oy=(this.H-size)/2;
-    for(let y=0;y<size;y+=step)for(let x=0;x<size;x+=step){
-      const i=(y*size+x)*4;
-      if(data[i+3]>100)pts.push({tx:ox+x,ty:oy+y,r:data[i],g:data[i+1],b:data[i+2]});
-    }
-    return pts;
-  }
-  initParticles(pts){
-    this.particles=pts.map(p=>({
-      x:Math.random()*this.W,y:Math.random()*this.H,
-      tx:p.tx,ty:p.ty,
-      vx:(Math.random()-.5)*8,vy:(Math.random()-.5)*8,
-      color:`${p.r},${p.g},${p.b}`,
-      sz:(0.7+Math.random()*1.6)*this.dpr,
-      life:1,
-    }));
-  }
-  update(){
-    const s=this.state,ps=this.particles;
-    if(s==='forming'){
-      ps.forEach(p=>{
-        const dx=p.tx-p.x,dy=p.ty-p.y;
-        p.vx+=dx*.075;p.vy+=dy*.075;p.vx*=.82;p.vy*=.82;
-        p.x+=p.vx;p.y+=p.vy;
-      });
-    }else if(s==='formed'){
-      ps.forEach(p=>{
-        p.vx+=(Math.random()-.5)*.2;p.vy+=(Math.random()-.5)*.2;
-        p.vx*=.9;p.vy*=.9;p.x+=p.vx;p.y+=p.vy;
-      });
-    }else if(s==='dissolving'){
-      ps.forEach(p=>{
-        p.vx+=(Math.random()-.5)*4;p.vy+=-1+(Math.random()-.5)*3;
-        p.vx*=.97;p.vy*=.97;p.x+=p.vx;p.y+=p.vy;p.life-=.014;
-      });
-    }
-  }
-  draw(){
-    const{ctx,W,H,state,particles}=this;
-    ctx.clearRect(0,0,W,H);
-    particles.forEach(p=>{
-      const a=state==='dissolving'?Math.max(0,p.life):.88;
-      if(a<=0)return;
-      ctx.globalAlpha=a;
-      ctx.fillStyle=`rgb(${p.color})`;
-      ctx.beginPath();ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);ctx.fill();
-    });
-    ctx.globalAlpha=1;
-  }
-  async runCycle(){
-    if(this._stop)return;
-    const key=this.keys[this.vi];
-    const str=SVG[key]?.(300);if(!str)return;
-    try{
-      const pts=await this.sampleSVG(str);if(this._stop)return;
-      this.initParticles(pts);
-      this.state='forming';await delay(2600);if(this._stop)return;
-      this.state='formed';await delay(2600);if(this._stop)return;
-      this.state='dissolving';await delay(1600);if(this._stop)return;
-    }catch(e){console.warn(e);}
-    this.vi=(this.vi+1)%this.keys.length;
-    this.runCycle();
-  }
-  start(){
-    const loop=()=>{if(this._stop)return;this.update();this.draw();this.frameId=requestAnimationFrame(loop);};
-    loop();this.runCycle();
-  }
-  stop(){this._stop=true;if(this.frameId)cancelAnimationFrame(this.frameId);}
+function getPhoto(type,id){
+  if(type==='farmer') return PHOTOS.farmers[id]||PHOTOS.products.leaf;
+  if(type==='product') return PHOTOS.products[id]||PHOTOS.products.leaf;
+  return PHOTOS.products.leaf;
 }
 
-/* ══════════════ HELPERS ══════════════ */
+/* ══ SVG (パーティクル生成専用 — 画面に表示しない) ══ */
+const SVG={
+  corn:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M60 130 Q50 90 70 50 Q80 30 90 45 Q75 75 80 130Z" fill="#1E5A22"/><path d="M140 130 Q150 90 130 50 Q120 30 110 45 Q125 75 120 130Z" fill="#2A6E2E"/><ellipse cx="100" cy="110" rx="32" ry="55" fill="#F5D060"/><g fill="#333"><ellipse cx="90" cy="75" rx="4" ry="3"/><ellipse cx="100" cy="72" rx="4" ry="3"/><ellipse cx="110" cy="75" rx="4" ry="3"/><ellipse cx="85" cy="86" rx="4" ry="3"/><ellipse cx="95" cy="83" rx="4" ry="3"/><ellipse cx="105" cy="83" rx="4" ry="3"/><ellipse cx="115" cy="86" rx="4" ry="3"/><ellipse cx="83" cy="97" rx="4" ry="3"/><ellipse cx="93" cy="94" rx="4" ry="3"/><ellipse cx="100" cy="94" rx="4" ry="3"/><ellipse cx="107" cy="94" rx="4" ry="3"/><ellipse cx="117" cy="97" rx="4" ry="3"/><ellipse cx="85" cy="108" rx="4" ry="3"/><ellipse cx="95" cy="105" rx="4" ry="3"/><ellipse cx="100" cy="105" rx="4" ry="3"/><ellipse cx="105" cy="105" rx="4" ry="3"/><ellipse cx="115" cy="108" rx="4" ry="3"/><ellipse cx="88" cy="119" rx="4" ry="3"/><ellipse cx="100" cy="117" rx="4" ry="3"/><ellipse cx="112" cy="119" rx="4" ry="3"/><ellipse cx="93" cy="130" rx="4" ry="3"/><ellipse cx="107" cy="130" rx="4" ry="3"/><ellipse cx="100" cy="142" rx="4" ry="3"/></g></svg>`,
+  strawberry:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 70 Q85 55 80 40 Q90 50 100 55 Q110 50 120 40 Q115 55 100 70Z" fill="#1E6A22"/><path d="M100 75 Q70 80 65 110 Q60 140 100 165 Q140 140 135 110 Q130 80 100 75Z" fill="#C94A5E"/><g fill="#333"><ellipse cx="88" cy="95" rx="3" ry="4" transform="rotate(-15 88 95)"/><ellipse cx="100" cy="90" rx="3" ry="4"/><ellipse cx="112" cy="95" rx="3" ry="4" transform="rotate(15 112 95)"/><ellipse cx="82" cy="110" rx="3" ry="4" transform="rotate(-20 82 110)"/><ellipse cx="94" cy="107" rx="3" ry="4"/><ellipse cx="106" cy="107" rx="3" ry="4"/><ellipse cx="118" cy="110" rx="3" ry="4" transform="rotate(20 118 110)"/><ellipse cx="88" cy="124" rx="3" ry="4"/><ellipse cx="100" cy="122" rx="3" ry="4"/><ellipse cx="112" cy="124" rx="3" ry="4"/><ellipse cx="100" cy="150" rx="3" ry="4"/></g></svg>`,
+  potato:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="105" rx="55" ry="42" fill="#C4A060" transform="rotate(-10 100 105)"/><circle cx="75" cy="95" r="5" fill="#333"/><circle cx="115" cy="88" r="5" fill="#333"/><circle cx="100" cy="118" r="4" fill="#333"/></svg>`,
+  onion:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 55 Q98 40 95 25 M100 55 Q102 40 105 25" stroke="#2A6E2E" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M100 55 Q65 60 58 100 Q56 135 100 155 Q144 135 142 100 Q135 60 100 55Z" fill="#D4A8CC"/></svg>`,
+  grape:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><circle cx="84" cy="80" r="16" fill="#6A3090"/><circle cx="100" cy="76" r="16" fill="#7A3AA0"/><circle cx="116" cy="80" r="16" fill="#6A3090"/><circle cx="76" cy="106" r="16" fill="#7A3AA0"/><circle cx="92" cy="102" r="16" fill="#6A3090"/><circle cx="108" cy="102" r="16" fill="#7A3AA0"/><circle cx="124" cy="106" r="16" fill="#6A3090"/><circle cx="84" cy="130" r="16" fill="#6A3090"/><circle cx="100" cy="128" r="16" fill="#7A3AA0"/><circle cx="116" cy="130" r="16" fill="#6A3090"/><circle cx="100" cy="154" r="15" fill="#7A3AA0"/></svg>`,
+  peach:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 55 Q55 60 50 105 Q48 150 100 165 Q152 150 150 105 Q145 60 100 55Z" fill="#F0A058"/></svg>`,
+  egg:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 40 Q55 48 50 105 Q48 155 100 168 Q152 155 150 105 Q145 48 100 40Z" fill="#F5EED8"/></svg>`,
+  leaf:(s=200)=>`<svg width="${s}" height="${s}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><path d="M100 160 Q60 140 50 100 Q40 60 100 40 Q160 60 150 100 Q140 140 100 160Z" fill="#2A6A30"/><path d="M100 160 Q100 100 100 40" stroke="#1A4A20" stroke-width="2" fill="none"/></svg>`,
+};
+
+/* ══ SCROLL SEQUENCE (endangeredveggies 再現) ══ */
+class ScrollSequence {
+  constructor(){
+    this.cur = 0;
+    this.ticking = false;
+    /* ■ シーケンス定義: 農家4フレーム + CTA */
+    this.frames = [
+      { type:'photo', img: PHOTOS.farmers['solato'],          label:'Hyogo / Itami',     name:'solato',               sub:'農業を、未来の憧れに。' },
+      { type:'photo', img: PHOTOS.farmers['yamamoto-farm'],   label:'Hokkaido / Furano', name:'山本農園',              sub:'大地の恵みを、まっすぐに。' },
+      { type:'photo', img: PHOTOS.farmers['sunrise-orchard'], label:'Yamanashi / Koshu', name:'サンライズ\nオーチャード', sub:'太陽と向き合い続けた果実。' },
+      { type:'photo', img: PHOTOS.farmers['tanaka-farm'],     label:'Okayama / Maniwa',  name:'卵の里\n田中農場',       sub:'鶏が笑う農場の卵。' },
+      { type:'cta' },
+    ];
+  }
+  get total(){ return this.frames.length; }
+  /* wrapper の高さをシーケンス数 × 100vh にセット */
+  setHeight(){
+    const sp = document.getElementById('hero-scroll-space');
+    if(sp) sp.style.height = `${this.total * 100}vh`;
+  }
+  /* スクロール量からフレームインデックスを計算 */
+  getIndex(){
+    const wrapper = document.getElementById('hero-wrapper');
+    if(!wrapper) return 0;
+    const top = wrapper.getBoundingClientRect().top;
+    const scrolled = -top; /* wrapperの上端がビューポートを超えた量 */
+    const perFrame = window.innerHeight;
+    return Math.max(0, Math.min(Math.floor(scrolled / perFrame), this.total - 1));
+  }
+  /* フレーム内の進行度 (0~1) */
+  getProgress(){
+    const wrapper = document.getElementById('hero-wrapper');
+    if(!wrapper) return 0;
+    const top = wrapper.getBoundingClientRect().top;
+    const scrolled = -top;
+    const perFrame = window.innerHeight;
+    return (scrolled % perFrame) / perFrame;
+  }
+  update(){
+    const idx = this.getIndex();
+    if(idx === this.cur) return;
+    const prev = this.cur;
+    this.cur = idx;
+    /* 写真スライド切り替え */
+    document.querySelectorAll('.seq-slide').forEach((el,i) => {
+      el.classList.toggle('active', i === idx);
+    });
+    document.querySelectorAll('.seq-cta-frame').forEach(el => {
+      el.classList.toggle('active', this.frames[idx]?.type === 'cta');
+    });
+    /* カウンター更新 */
+    const photoCount = this.frames.filter(f=>f.type==='photo').length;
+    const photoIdx = Math.min(idx, photoCount - 1);
+    const counter = document.getElementById('seq-counter');
+    if(counter){
+      counter.innerHTML = `<span class="seq-counter-cur">${String(photoIdx+1).padStart(2,'0')}</span> / ${String(photoCount).padStart(2,'0')}`;
+      counter.style.opacity = this.frames[idx]?.type === 'cta' ? '0' : '1';
+    }
+    /* ボトムラインとスクロールヒント: 最初のフレームのみ */
+    const bl = document.querySelector('.seq-bottom-line');
+    if(bl) bl.style.opacity = idx === 0 ? '1' : '0.4';
+  }
+  listen(){
+    window.addEventListener('scroll', () => {
+      if(this.ticking) return;
+      this.ticking = true;
+      requestAnimationFrame(() => { this.update(); this.ticking = false; });
+    }, {passive:true});
+    this.update();
+  }
+}
+window._seq = null;
+
+/* ══ HELPERS ══ */
 const NOW_MONTH=new Date().getMonth()+1;
 function isInSeason(s,m=NOW_MONTH){return s.start<=s.end?m>=s.start&&m<=s.end:m>=s.start||m<=s.end;}
 function fmtPrice(n){return'¥'+n.toLocaleString('ja-JP');}
@@ -689,9 +899,9 @@ const FARMER_STATS={
   'tanaka-farm':[{num:'5×',unit:'',label:'一般農場比の飼育面積'},{num:'0',unit:'mg',label:'抗生物質'},{num:'20+',unit:'年',label:'平飼い実績'}],
 };
 
-/* ══════════════ CART ══════════════ */
+/* ══ CART ══ */
 const Cart={
-  KEY:'sen_v3',items:[],
+  KEY:'sen_v4',items:[],
   load(){try{this.items=JSON.parse(localStorage.getItem(this.KEY))||[];}catch{this.items=[];}this.updateBadge();},
   save(){localStorage.setItem(this.KEY,JSON.stringify(this.items));},
   add(id,qty=1){const x=this.items.find(i=>i.id===id);if(x)x.qty+=qty;else this.items.push({id,qty});this.save();this.updateBadge();this.animateBadge();},
@@ -707,22 +917,24 @@ const Cart={
     if(!this.items.length){list.innerHTML='<div class="cart-empty">カートは空です</div>';if(tot)tot.textContent='¥0';return;}
     list.innerHTML=this.items.map(item=>{
       const p=PRODUCTS[item.id];if(!p)return'';
-      return`<div class="cart-row"><div class="cart-row-img">${getIllus(p.illustrationType,52)}</div>
-      <div><div class="cart-row-name">${p.shortName}</div><div class="cart-row-price">${fmtPrice(p.price)} / ${p.unit}</div></div>
-      <div class="cart-row-ctrl">
-        <button class="cqb" onclick="Cart.update('${item.id}',${item.qty-1})">−</button>
-        <span class="cqn">${item.qty}</span>
-        <button class="cqb" onclick="Cart.update('${item.id}',${item.qty+1})">＋</button>
-      </div></div>`;
+      const img=getPhoto('product',p.illustrationType);
+      return`<div class="cart-row">
+        <div class="cart-row-img"><img src="${img}" alt="${p.shortName}" loading="lazy"></div>
+        <div><div class="cart-row-name">${p.shortName}</div><div class="cart-row-price">${fmtPrice(p.price)} / ${p.unit}</div></div>
+        <div class="cart-row-ctrl">
+          <button class="cqb" onclick="Cart.update('${item.id}',${item.qty-1})">−</button>
+          <span class="cqn">${item.qty}</span>
+          <button class="cqb" onclick="Cart.update('${item.id}',${item.qty+1})">＋</button>
+        </div></div>`;
     }).join('');
     if(tot)tot.textContent=fmtPrice(this.total());
   }
 };
 
-/* ══════════════ PRODUCT CARD ══════════════ */
+/* ══ PRODUCT CARD ══ */
 function ProductCard(product,farmer){
   const inSeason=isInSeason(product.season);
-  const grad=product.cardGradient||farmer?.gradient||'linear-gradient(135deg,#1A3220,#2D5830)';
+  const img=getPhoto('product',product.illustrationType);
   const badges=[
     product.stock==='limited'?'<span class="badge b-lim">数量限定</span>':'',
     product.newArrival?'<span class="badge b-new">NEW</span>':'',
@@ -730,7 +942,7 @@ function ProductCard(product,farmer){
     inSeason?'<span class="badge b-season">今が旬</span>':'',
   ].filter(Boolean).join('');
   return`<div class="pcard" onclick="navigate('product/${product.id}')">
-    <div class="pcard-img" style="background:${grad}">${getIllus(product.illustrationType,130)}</div>
+    <div class="pcard-img"><img src="${img}" alt="${product.shortName}" loading="lazy"></div>
     <div class="pcard-body">
       <div class="pcard-badges">${badges}</div>
       <div class="pcard-name">${product.name}</div>
@@ -742,144 +954,133 @@ function ProductCard(product,farmer){
   </div>`;
 }
 
-/* ══════════════ FARMER SECTION ══════════════ */
-function FarmerSection(farmer){
-  const stats=FARMER_STATS[farmer.id]||[];
-  const products=(farmer.products||[]).map(pid=>PRODUCTS[pid]).filter(Boolean);
-  const storyParas=farmer.story.split('。').filter(s=>s.trim()).map(s=>`<p class="story-para" data-reveal>${s}。</p>`).join('');
-  return`<section id="farmer-${farmer.id}" class="farmer-section">
-    <div class="farmer-header" style="--fgrad:${farmer.gradient}">
-      <div class="farmer-header-text" data-reveal data-dir="left">
-        <div class="farmer-region">${farmer.region.pref} · ${farmer.region.city}</div>
-        <h2 class="farmer-name-huge">${farmer.name}</h2>
-        <div class="farmer-tagline">${farmer.tagline}</div>
-      </div>
-      <div class="farmer-header-vis" data-reveal data-dir="right">${getIllus(farmer.heroType||'leaf',340)}</div>
-    </div>
-    <div class="farmer-story">
-      <div class="farmer-story-inner">
-        <div class="story-eyebrow" data-reveal>Story</div>
-        ${storyParas}
-      </div>
-    </div>
-    <div class="farmer-stats">
-      <div class="farmer-stats-inner">
-        ${stats.map(s=>`<div class="stat-item" data-reveal>
-          <div class="stat-num">${s.num}</div>
-          <div class="stat-unit">${s.unit}</div>
-          <div class="stat-label">${s.label}</div>
-        </div>`).join('')}
-      </div>
-    </div>
-    <div class="farmer-products">
-      <div class="farmer-products-inner">
-        <div class="products-eyebrow" data-reveal>Products</div>
-        <div class="products-grid">${products.map(p=>ProductCard(p,farmer)).join('')}</div>
-      </div>
-    </div>
-    <div class="farmer-band" data-reveal><div class="band-quote">${farmer.catchphrase}</div></div>
-  </section>`;
+/* ══ NAV DROP ══ */
+function buildNavDrop(){
+  const dd=document.getElementById('nav-drop');if(!dd)return;
+  dd.innerHTML=Object.values(FARMERS).map(f=>`
+    <a class="drop-item" href="#" onclick="goHome('farmer-${f.id}');return false">
+      <div class="drop-thumb"><img src="${getPhoto('farmer',f.id)}" alt="${f.name}" loading="lazy"></div>
+      <div><strong>${f.name}</strong><em>${f.region.pref} · ${f.region.city}</em></div>
+    </a>`).join('')+`<div class="drop-more">and more farmers coming!</div>`;
 }
 
-/* ══════════════ CALENDAR ══════════════ */
-function CalSection(){
-  const months=['1','2','3','4','5','6','7','8','9','10','11','12'];
-  const hdr=months.map((_,i)=>`<th class="${(i+1)===NOW_MONTH?'now':''}">${i+1}月</th>`).join('');
-  const rows=Object.values(FARMERS).map(f=>{
-    const cells=months.map((_,i)=>{
-      const m=i+1,on=(f.products||[]).some(pid=>{const p=PRODUCTS[pid];return p&&isInSeason(p.season,m);});
-      return`<td class="${m===NOW_MONTH?'now':''}">${on?`<span class="cal-dot on" style="background:${f.accentColor||'#C49A30'}"></span>`:''}</td>`;
-    }).join('');
-    return`<tr><td class="cal-name">${f.name}</td>${cells}</tr>`;
-  }).join('');
-  return`<section id="section-calendar" class="calendar-section">
-    <div class="cal-inner">
-      <div class="sec-eyebrow" data-reveal>Seasonal Calendar</div>
-      <h2 class="section-h2" data-reveal>旬のカレンダー</h2>
-      <div class="cal-wrap" data-reveal>
-        <table class="cal-table">
-          <thead><tr><th style="text-align:left;padding:8px 16px">農家</th>${hdr}</tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </div>
-  </section>`;
+/* ══ FLOATING PARALLAX ══ */
+function initFloaters(){
+  const section = document.querySelector('.float-section');
+  if(!section) return;
+  /* IntersectionObserver でフラッシュテキスト発火 */
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      section.classList.toggle('vis', e.isIntersecting);
+    });
+  },{threshold:.3});
+  obs.observe(section);
+  /* スクロールパラックス */
+  window.addEventListener('scroll', () => {
+    const rect = section.getBoundingClientRect();
+    const progress = -rect.top / window.innerHeight;
+    section.querySelectorAll('[data-float]').forEach(el => {
+      const spd = parseFloat(el.dataset.float);
+      const rot = parseFloat(el.dataset.rot||0);
+      el.style.transform = `translate(${progress*spd*0.18}px,${progress*spd}px) rotate(${progress*rot}deg)`;
+    });
+  },{passive:true});
 }
 
-/* ══════════════ HOME ══════════════ */
-function renderHome(){
-  const farmers=Object.values(FARMERS);
-  document.getElementById('app').innerHTML=`
-    <section class="hero">
-      <canvas id="hero-canvas"></canvas>
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <div class="hero-eyebrow">SEN Agricultural EC Platform</div>
-        <h1 class="hero-h1">
-          <span class="hero-line"><span class="hero-line-in" style="--d:.4s">農家の、</span></span>
-          <span class="hero-line"><span class="hero-line-in" style="--d:.65s"><em>情熱</em>を。</span></span>
-          <span class="hero-line"><span class="hero-line-in" style="--d:.9s">食卓に届ける。</span></span>
-        </h1>
-        <p class="hero-body">全国の農家が、覚悟と誇りで育てた作物を<br>産地直送でお届けします。価格ではなく、物語で選ぶ。</p>
-        <div class="hero-cta">
-          <button class="btn-primary" onclick="scrollToId('farmer-${farmers[0]?.id}')">農家を見る</button>
-          <button class="btn-ghost" onclick="scrollToId('statement')">この取り組みについて</button>
-        </div>
-      </div>
-      <div class="hero-credit">Illustration by SEN Agricultural EC</div>
-      <div class="hero-scroll-indicator"><div class="scroll-line"></div><span class="scroll-text">Scroll</span></div>
-    </section>
-
-    <section id="statement" class="statement">
-      <div class="statement-inner">
-        <div class="sec-eyebrow" data-reveal>About SEN</div>
-        <h2 class="statement-h" data-reveal>農家の「本物」が、<br>スーパーに並ばない理由がある。</h2>
-        <p class="statement-body" data-reveal>生産効率を優先した流通の中で、農家の情熱や物語は消えていく。SENは農家と消費者をダイレクトにつなぎ、「誰が・どこで・どんな想いで育てたか」を一緒に届けます。</p>
-      </div>
-    </section>
-
-    <nav class="farmer-tabs" id="farmer-tabs">
-      <div class="farmer-tabs-scroll">
-        ${farmers.map(f=>`<div class="ftab" data-fid="${f.id}" onclick="scrollToId('farmer-${f.id}')">${f.name}</div>`).join('')}
-      </div>
-    </nav>
-
-    ${farmers.map(FarmerSection).join('')}
-    ${CalSection()}
-
-    <section id="section-join" class="join-section">
-      <div class="join-inner">
-        <h2 class="join-h" data-reveal>農家になる</h2>
-        <p class="join-sub" data-reveal>SENのプラットフォームに参加しませんか？<br>あなたの農場の物語を、全国の食卓に届けましょう。</p>
-        <button class="btn-outline" data-reveal onclick="alert('農家の方は info@sen-ec.jp までご連絡ください（デモ版）')">お問い合わせ →</button>
-      </div>
-    </section>
-
-    <footer>
-      <div class="footer-top">
-        <div><div class="footer-logo-name">SEN<sup style="font-size:.5em">®</sup></div><div class="footer-logo-sub">Agricultural EC Platform</div></div>
-        <div class="footer-links">
-          <div class="footer-group"><label>加盟農家</label>${farmers.map(f=>`<a onclick="scrollToId('farmer-${f.id}')">${f.name}</a>`).join('')}</div>
-          <div class="footer-group"><label>プラットフォーム</label><a onclick="scrollToId('statement')">この取り組みについて</a><a onclick="scrollToId('section-calendar')">旬カレンダー</a><a onclick="scrollToId('section-join')">農家になる</a></div>
-          <div class="footer-group"><label>サポート</label><a href="#">配送について</a><a href="#">ギフトについて</a><a href="#">お問い合わせ</a></div>
-        </div>
-      </div>
-      <div class="footer-btm">© 2026 SEN Agricultural EC Platform. All rights reserved.</div>
-    </footer>
-  `;
-  requestAnimationFrame(()=>requestAnimationFrame(initCanvas));
-  initReveal();
-  initFarmerTabs();
-  buildNavDrop();
+/* ══ REVEAL ══ */
+function initReveal(){
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach((e,i)=>{
+      if(!e.isIntersecting)return;
+      setTimeout(()=>e.target.classList.add('vis'),i*55);
+      obs.unobserve(e.target);
+    });
+  },{threshold:.12});
+  document.querySelectorAll('[data-reveal]:not(.vis)').forEach(el=>obs.observe(el));
 }
 
-/* ══════════════ PRODUCT DETAIL ══════════════ */
+/* ══ FARMER TABS ══ */
+function initFarmerTabs(){
+  const secs=document.querySelectorAll('.farmer-section');
+  const tabs=document.querySelectorAll('.ftab');
+  if(!secs.length||!tabs.length)return;
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const id=e.target.id.replace('farmer-','');
+        tabs.forEach(t=>t.classList.toggle('on',t.dataset.fid===id));
+      }
+    });
+  },{threshold:.25,rootMargin:`-${72+44}px 0px 0px 0px`});
+  secs.forEach(s=>obs.observe(s));
+}
+
+/* ══ NAV SCROLL ══ */
+window.addEventListener('scroll',()=>{
+  const nav=document.getElementById('nav');
+  nav.classList.toggle('solid',window.scrollY>40);
+},{passive:true});
+
+/* ══ MOBILE MENU ══ */
+function toggleMobileMenu(){
+  const m=document.getElementById('mobile-menu');
+  const h=document.getElementById('hamburger');
+  const open=m.classList.toggle('open');
+  h.classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeMobileMenu(){
+  document.getElementById('mobile-menu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+/* ══ CART MODAL ══ */
+function openCart(){Cart.renderItems();document.getElementById('cart-overlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeCart(){document.getElementById('cart-overlay').classList.remove('open');document.body.style.overflow='';}
+
+/* ══ ROUTING ══ */
+function navigate(path){location.hash=path;}
+function goHome(anchorId){
+  const hash=(location.hash||'').replace('#','');
+  if(hash.startsWith('product/')){
+    history.replaceState(null,'','#home');
+    window.scrollTo(0,0);
+    renderHome();
+    if(anchorId)setTimeout(()=>scrollToId(anchorId),500);
+  }else{
+    if(anchorId)scrollToId(anchorId);else window.scrollTo({top:0,behavior:'smooth'});
+  }
+}
+function scrollToId(id){
+  const el=document.getElementById(id);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function router(){
+  const hash=(location.hash||'#home').replace('#','');
+  if(hash.startsWith('product/')){
+    window.scrollTo(0,0);
+    renderDetail(hash.split('/')[1]);
+  }else{
+    const needRender=!document.querySelector('.hero')||!!document.querySelector('.detail-page');
+    if(needRender){
+      window.scrollTo(0,0);
+      renderHome();
+      if(hash&&hash!=='home')setTimeout(()=>scrollToId(hash),500);
+    }else{
+      if(hash&&hash!=='home')setTimeout(()=>scrollToId(hash),100);
+    }
+  }
+}
+window.addEventListener('hashchange',router);
+
+/* ══ PRODUCT DETAIL ══ */
 let _qty=1;
 function renderDetail(id){
   const product=PRODUCTS[id];if(!product){renderHome();return;}
   const farmer=FARMERS[product.farmerId];
   _qty=1;
-  const grad=product.cardGradient||farmer?.gradient||'linear-gradient(135deg,#0D1A0F,#152018)';
+  const img=getPhoto('product',product.illustrationType);
   const sc=product.stock||'in_stock';
   const scCls={in_stock:'sb-in',limited:'sb-lim',out_of_stock:'sb-out',pre_order:'sb-pre'}[sc];
   const months=['1','2','3','4','5','6','7','8','9','10','11','12'];
@@ -895,7 +1096,7 @@ function renderDetail(id){
     <div class="detail-page">
       <div class="detail-hero">
         <div class="detail-hero-inner">
-          <div class="detail-illus" style="background:${grad}">${getIllus(product.illustrationType,400)}</div>
+          <div class="detail-illus"><img src="${img}" alt="${product.name}"></div>
           <div>
             <div class="detail-bc"><a onclick="goHome()">ホーム</a><span>›</span><span>${product.shortName}</span></div>
             <div class="detail-badges">${badges}</div>
@@ -903,7 +1104,7 @@ function renderDetail(id){
             <div class="detail-origin">${product.specs?.origin||''}</div>
             <div class="detail-price">${fmtPrice(product.price)}<small>税込</small></div>
             <div class="detail-unit">${product.unit}</div>
-            <div class="stock-badge ${scCls||'sb-in'}">${stockLabel(sc)}</div>
+            <div class="stock-badge ${scCls}">${stockLabel(sc)}</div>
             <div class="detail-appeal">${product.appeal||product.description}</div>
             <div class="season-bar-lbl">旬の時期 ${seasonRange(product.season)}</div>
             <div class="season-months">${sBar}</div>
@@ -929,7 +1130,7 @@ function renderDetail(id){
               <button class="dtab" onclick="swTab('howto')">食べ方</button>
               <button class="dtab" onclick="swTab('specs')">配送</button>
             </div>
-            <div class="dtab-pane on" id="tab-desc"><div class="dtab-text"><strong style="display:block;margin-bottom:10px;color:var(--text-body)">"${product.farmStory}"</strong>${product.description}</div></div>
+            <div class="dtab-pane on" id="tab-desc"><div class="dtab-text"><strong style="display:block;margin-bottom:10px;color:var(--text)">"${product.farmStory}"</strong>${product.description}</div></div>
             <div class="dtab-pane" id="tab-method"><div class="dtab-text">${farmer?.method||''}</div></div>
             <div class="dtab-pane" id="tab-howto">${(product.howto||[]).map(h=>`<div class="howto-item">${h}</div>`).join('')}</div>
             <div class="dtab-pane" id="tab-specs">${Object.entries(product.specs||{}).map(([k,v])=>{const L={origin:'産地',shipping:'発送',storage:'保存方法',expiry:'消費目安',packaging:'梱包'};return`<div class="spec-row"><span class="spec-lbl">${L[k]||k}</span><span class="spec-val">${v}</span></div>`;}).join('')}</div>
@@ -937,17 +1138,16 @@ function renderDetail(id){
           <div>
             ${farmer?`<div class="dfc" onclick="goHome('farmer-${farmer.id}')">
               <div class="dfc-top">
-                <div class="dfc-illus" style="background:${farmer.gradient}">${getIllus(farmer.heroType||'leaf',52)}</div>
+                <div class="dfc-illus"><img src="${getPhoto('farmer',farmer.id)}" alt="${farmer.name}" loading="lazy"></div>
                 <div><div class="dfc-name">${farmer.name}</div><div class="dfc-pref">${farmer.region.pref} · ${farmer.region.city}</div></div>
               </div>
               <div class="dfc-catch">"${farmer.catchphrase}"</div>
             </div>`:''}
-            ${related.length?`<div style="margin-top:24px"><div style="font-family:var(--f-label);font-size:.76rem;letter-spacing:.24em;color:var(--text-muted);margin-bottom:14px">この農家の他の商品</div><div style="display:flex;flex-direction:column;gap:10px">${related.map(p=>ProductCard(p,farmer)).join('')}</div></div>`:''}
+            ${related.length?`<div style="margin-top:24px"><div style="font-family:var(--f-label);font-size:.76rem;letter-spacing:.24em;color:var(--sub);margin-bottom:14px">この農家の他の商品</div><div style="display:flex;flex-direction:column;gap:10px">${related.map(p=>ProductCard(p,farmer)).join('')}</div></div>`:''}
           </div>
         </div>
       </div>
-    </div>
-  `;
+    </div>`;
   buildNavDrop();
 }
 function chQty(d){_qty=Math.max(1,_qty+d);const el=document.getElementById('qnum');if(el)el.textContent=_qty;}
@@ -958,108 +1158,272 @@ function swTab(n){
   document.getElementById(`tab-${n}`)?.classList.add('on');
 }
 
-/* ══════════════ NAV DROP ══════════════ */
-function buildNavDrop(){
-  const dd=document.getElementById('nav-drop');if(!dd)return;
-  dd.innerHTML=Object.values(FARMERS).map(f=>`
-    <a class="drop-item" href="#" onclick="goHome('farmer-${f.id}');return false">
-      <div class="drop-thumb" style="background:${f.gradient}">${getIllus(f.heroType||'leaf',36)}</div>
-      <div><strong>${f.name}</strong><em>${f.region.pref} · ${f.region.city}</em></div>
-    </a>`).join('')+`<div class="drop-more">and more farmers coming!</div>`;
+/* ══ FARMER SECTION ══ */
+function FarmerSection(farmer){
+  const stats=FARMER_STATS[farmer.id]||[];
+  const products=(farmer.products||[]).map(pid=>PRODUCTS[pid]).filter(Boolean);
+  const storyParas=farmer.story.split('。').filter(s=>s.trim()).map(s=>`<p class="story-para" data-reveal>${s}。</p>`).join('');
+  const storyImgs=PHOTOS.story[farmer.id]||[PHOTOS.farmers[farmer.id],PHOTOS.farmers[farmer.id]];
+  const farmerImg=getPhoto('farmer',farmer.id);
+  return`<section id="farmer-${farmer.id}" class="farmer-section">
+    <div class="farmer-header">
+      <div class="fh-photo">
+        <img src="${farmerImg}" alt="${farmer.name}" loading="lazy">
+      </div>
+      <div class="fh-text" data-reveal data-dir="right">
+        <div class="fh-divider"></div>
+        <div class="farmer-region">${farmer.region.pref} · ${farmer.region.city}</div>
+        <h2 class="farmer-name-huge">${farmer.name}</h2>
+        <div class="farmer-tagline">${farmer.tagline}</div>
+        <div class="farmer-since">${farmer.since}年創業</div>
+      </div>
+    </div>
+    <div class="farmer-story">
+      <div class="farmer-story-inner">
+        <div class="story-eyebrow" data-reveal>Story</div>
+        ${storyParas}
+        <div class="story-photos" data-reveal>
+          <div class="story-photo"><img src="${storyImgs[0]}" alt="${farmer.name} 1" loading="lazy"></div>
+          <div class="story-photo"><img src="${storyImgs[1]}" alt="${farmer.name} 2" loading="lazy"></div>
+        </div>
+      </div>
+    </div>
+    <div class="farmer-stats">
+      <div class="farmer-stats-inner">
+        ${stats.map(s=>`<div class="stat-item" data-reveal>
+          <div class="stat-num">${s.num}</div>
+          <div class="stat-unit">${s.unit}</div>
+          <div class="stat-label">${s.label}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="farmer-products">
+      <div class="farmer-products-inner">
+        <div class="products-eyebrow" data-reveal>Products</div>
+        <div class="products-grid">${products.map(p=>ProductCard(p,farmer)).join('')}</div>
+      </div>
+    </div>
+    <div class="farmer-band" data-reveal><div class="band-quote">${farmer.catchphrase}</div></div>
+  </section>`;
 }
 
-/* ══════════════ CANVAS ══════════════ */
-function initCanvas(){
-  const canvas=document.getElementById('hero-canvas');if(!canvas)return;
-  const dpr=window.devicePixelRatio||1;
-  const rect=canvas.getBoundingClientRect();
-  if(!rect.width||!rect.height){setTimeout(initCanvas,100);return;}
-  canvas.width=rect.width*dpr;
-  canvas.height=rect.height*dpr;
-  if(window._vp){window._vp.stop();window._vp=null;}
-  window._vp=new VegetableParticles(canvas);
-  window._vp.start();
+/* ══ CALENDAR ══ */
+function CalSection(){
+  const months=['1','2','3','4','5','6','7','8','9','10','11','12'];
+  const hdr=months.map((_,i)=>`<th class="${(i+1)===NOW_MONTH?'now':''}">${i+1}月</th>`).join('');
+  const rows=Object.values(FARMERS).map(f=>{
+    const cells=months.map((_,i)=>{
+      const m=i+1,on=(f.products||[]).some(pid=>{const p=PRODUCTS[pid];return p&&isInSeason(p.season,m);});
+      return`<td class="${m===NOW_MONTH?'now':''}">${on?`<span class="cal-dot on" style="background:${f.accentColor||'#C49A30'}"></span>`:''}</td>`;
+    }).join('');
+    return`<tr><td class="cal-name">${f.name}</td>${cells}</tr>`;
+  }).join('');
+  return`<section id="section-calendar" class="calendar-section">
+    <div class="cal-inner">
+      <div class="sec-eyebrow" data-reveal style="color:rgba(234,228,214,.35)">Seasonal Calendar</div>
+      <h2 class="section-h2" data-reveal>旬のカレンダー</h2>
+      <div class="cal-wrap" data-reveal>
+        <table class="cal-table">
+          <thead><tr><th style="text-align:left;padding:8px 14px">農家</th>${hdr}</tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  </section>`;
 }
 
-/* ══════════════ REVEAL ══════════════ */
-function initReveal(){
-  const obs=new IntersectionObserver(entries=>{
-    entries.forEach((e,i)=>{if(!e.isIntersecting)return;setTimeout(()=>e.target.classList.add('vis'),i*55);obs.unobserve(e.target);});
-  },{threshold:.12});
-  document.querySelectorAll('[data-reveal]:not(.vis)').forEach(el=>obs.observe(el));
+/* ══ MAP (SVG Japan + pins) ══ */
+function MapSection(){
+  /* ピン位置: SVGマップ(640×780)内のxy座標 */
+  const PIN_POS={
+    'solato':         {x:240,y:535},
+    'yamamoto-farm':  {x:410,y:130},
+    'sunrise-orchard':{x:280,y:500},
+    'tanaka-farm':    {x:220,y:545},
+  };
+  const farmers=Object.values(FARMERS);
+  const pins=farmers.map(f=>{
+    const pos=PIN_POS[f.id]||{x:300,y:400};
+    const pct={x:(pos.x/640*100).toFixed(2),y:(pos.y/780*100).toFixed(2)};
+    return`<div class="map-pin" style="left:${pct.x}%;top:${pct.y}%" onclick="scrollToId('farmer-${f.id}')">
+      <div class="map-pin-pulse"></div>
+      <div class="map-pin-dot"></div>
+      <div class="map-pin-label">${f.name}<br><span style="color:var(--sub)">${f.region.pref}</span></div>
+    </div>`;
+  }).join('');
+  const legend=farmers.map(f=>`<li onclick="scrollToId('farmer-${f.id}')">
+    <div class="ml-dot" style="background:${f.accentColor||'#C49A30'}"></div>
+    <div class="ml-info">
+      <div class="ml-name">${f.name}</div>
+      <div class="ml-loc">${f.region.pref} · ${f.region.city}</div>
+    </div>
+  </li>`).join('');
+  return`<section class="map-section">
+    <div class="map-inner">
+      <div class="sec-eyebrow" data-reveal>Farmer Map</div>
+      <h2 class="section-h2" data-reveal style="color:var(--text)">全国の農家から直送</h2>
+      <div class="map-grid">
+        <div class="map-wrap" data-reveal data-dir="left">
+          <!-- ■ 日本地図SVG: 簡易アウトライン -->
+          <svg id="japan-svg" viewBox="0 0 640 780" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M420 60 Q430 80 415 100 Q405 120 420 140 Q435 160 420 175 Q405 190 415 210 Q425 230 410 250 Q395 270 405 290 Q415 305 400 320 Q385 335 395 355 Q405 370 390 385 Q370 400 375 420 Q380 440 360 455 Q340 465 335 485 Q330 505 310 515 Q285 525 275 545 Q265 565 245 572 Q225 578 218 595 Q212 610 225 622 Q238 634 230 648 Q220 660 205 665 Q185 668 175 680" stroke="#C4A060" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M175 680 Q160 688 150 700 Q140 712 128 718 Q115 723 110 735 Q105 745 115 752 Q125 758 120 768 Q115 776 100 778" stroke="#C4A060" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <path d="M420 60 Q440 55 455 65 Q470 75 460 90 Q450 105 465 118 Q480 130 470 145 Q460 158 475 170 Q490 182 480 198 Q470 212 485 225 Q500 238 488 255 Q475 270 490 285 Q505 300 495 318 Q482 335 497 350 Q512 365 500 382 Q488 398 500 415 Q512 430 498 445 Q482 460 488 478 Q494 494 478 505 Q462 515 460 532 Q458 548 440 555 Q420 560 412 575 Q404 590 385 595 Q365 600 355 615 Q345 628 325 632 Q305 636 295 650 Q285 663 265 665 Q248 667 240 678 Q232 688 215 690" stroke="#C4A060" stroke-width="2" stroke-linecap="round" fill="none"/>
+            <!-- 北海道 -->
+            <path d="M360 80 Q375 65 395 58 Q415 52 420 60 Q425 68 410 78 Q395 88 405 100 Q415 112 400 120 Q380 128 370 140 Q355 155 345 148 Q335 140 345 128 Q355 116 345 105 Q335 94 345 86 Q355 78 360 80Z" stroke="#C4A060" stroke-width="2" fill="rgba(196,154,48,.08)"/>
+            <!-- 本州 概略 -->
+            <path d="M418 145 Q440 150 460 162 Q478 174 472 192 Q466 210 478 225 Q490 240 478 258 Q466 275 478 292 Q490 308 476 325 Q462 340 472 358 Q482 374 465 388 Q448 401 450 420 Q452 438 432 448 Q412 458 408 478 Q404 498 385 508 Q362 518 352 538 Q342 558 318 565 Q294 572 282 590 Q270 607 248 612 Q226 617 220 635 Q214 652 198 658 Q180 663 172 678" stroke="#C4A060" stroke-width="1.5" fill="rgba(196,154,48,.06)"/>
+            <!-- 四国 -->
+            <path d="M310 530 Q330 525 350 535 Q368 545 358 560 Q346 574 325 572 Q304 570 298 555 Q292 540 310 530Z" stroke="#C4A060" stroke-width="1.5" fill="rgba(196,154,48,.06)"/>
+            <!-- 九州 -->
+            <path d="M220 570 Q245 562 265 572 Q285 582 278 600 Q270 618 248 625 Q225 630 210 618 Q195 605 202 588 Q209 572 220 570Z" stroke="#C4A060" stroke-width="1.5" fill="rgba(196,154,48,.06)"/>
+          </svg>
+          <div style="position:absolute;inset:0">${pins}</div>
+        </div>
+        <div data-reveal data-dir="right">
+          <div class="sec-eyebrow" style="margin-bottom:24px">加盟農家</div>
+          <ul class="map-legend">${legend}</ul>
+        </div>
+      </div>
+    </div>
+  </section>`;
 }
 
-/* ══════════════ FARMER TABS ══════════════ */
-function initFarmerTabs(){
-  const secs=document.querySelectorAll('.farmer-section');
-  const tabs=document.querySelectorAll('.ftab');
-  if(!secs.length||!tabs.length)return;
-  const obs=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){const id=e.target.id.replace('farmer-','');tabs.forEach(t=>t.classList.toggle('on',t.dataset.fid===id));}
-    });
-  },{threshold:.3,rootMargin:`-${72+44}px 0px 0px 0px`});
-  secs.forEach(s=>obs.observe(s));
-}
+/* ══ HOME ══ */
+function renderHome(){
+  const farmers=Object.values(FARMERS);
+  /* スクロールシーケンスのビルド */
+  const seq = new ScrollSequence();
+  window._seq = seq;
+  const photoCount = seq.frames.filter(f=>f.type==='photo').length;
 
-/* ══════════════ NAV SCROLL ══════════════ */
-window.addEventListener('scroll',()=>{
-  document.getElementById('nav').classList.toggle('solid',window.scrollY>10);
-},{passive:true});
-
-/* ══════════════ MOBILE MENU ══════════════ */
-function toggleMobileMenu(){document.getElementById('mobile-menu').classList.toggle('open');}
-function closeMobileMenu(){document.getElementById('mobile-menu').classList.remove('open');}
-
-/* ══════════════ ROUTING ══════════════ */
-function navigate(path){location.hash=path;}
-function goHome(anchorId){
-  const hash=(location.hash||'').replace('#','');
-  if(hash.startsWith('product/')){
-    history.replaceState(null,'','#home');
-    window.scrollTo(0,0);
-    renderHome();
-    if(anchorId)setTimeout(()=>scrollToId(anchorId),500);
-  }else{
-    if(anchorId)scrollToId(anchorId);else window.scrollTo({top:0,behavior:'smooth'});
-  }
-}
-function scrollToId(id){
-  const el=document.getElementById(id);
-  if(el){el.scrollIntoView({behavior:'smooth',block:'start'});}
-}
-
-function router(){
-  const hash=(location.hash||'#home').replace('#','');
-  if(hash.startsWith('product/')){
-    window.scrollTo(0,0);
-    renderDetail(hash.split('/')[1]);
-  }else{
-    const needRender=!document.querySelector('.hero')||!!document.querySelector('.detail-page');
-    if(needRender){
-      window.scrollTo(0,0);
-      renderHome();
-      if(hash&&hash!=='home')setTimeout(()=>scrollToId(hash),500);
-    }else{
-      if(hash&&hash!=='home')setTimeout(()=>scrollToId(hash),100);
+  /* 写真スライドHTML */
+  const slidesHtml = seq.frames.map((f,i) => {
+    if(f.type === 'cta'){
+      return `<div class="seq-cta-frame" id="seq-cta">
+        <div class="seq-cta-eyebrow">SEN Agricultural EC Platform</div>
+        <h1 class="seq-cta-h1">
+          農家の、<br><em>情熱</em>を。<br>食卓に届ける。
+        </h1>
+        <p class="seq-cta-body">全国の農家が、覚悟と誇りで育てた作物を産地直送でお届けします。価格ではなく、物語で選ぶ。</p>
+        <div class="seq-cta-btns">
+          <button class="btn-primary" onclick="scrollToId('farmer-${farmers[0]?.id}')">農家を見る</button>
+          <button class="btn-ghost" onclick="scrollToId('statement')">この取り組みについて</button>
+        </div>
+      </div>`;
     }
+    return `<div class="seq-slide${i===0?' active':''}">
+      <img class="seq-slide-img" src="${f.img}" alt="${f.name}" loading="${i===0?'eager':'lazy'}">
+      <div class="seq-text">
+        <div class="seq-label">${f.label}</div>
+        <div class="seq-name">${f.name.replace('\n','<br>')}</div>
+        <div class="seq-sub">${f.sub}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  /* 浮遊野菜セクション (endangeredveggies の3D浮遊再現) */
+  const floatItems = [
+    {img: PHOTOS.products.corn,       size:220, x:15,  y:35,  spd:-80,  rot:25 },
+    {img: PHOTOS.products.grape,      size:260, x:72,  y:20,  spd:-120, rot:-18},
+    {img: PHOTOS.products.peach,      size:180, x:45,  y:60,  spd:-60,  rot:12 },
+    {img: PHOTOS.products.potato,     size:200, x:82,  y:55,  spd:-100, rot:-22},
+    {img: PHOTOS.products.strawberry, size:150, x:28,  y:72,  spd:-50,  rot:30 },
+    {img: PHOTOS.products.onion,      size:170, x:60,  y:78,  spd:-90,  rot:-15},
+  ];
+  const floatersHtml = floatItems.map(f =>
+    `<div class="floater" style="left:${f.x}%;top:${f.y}%" data-float="${f.spd}" data-rot="${f.rot}">
+      <img src="${f.img}" alt="" width="${f.size}" height="${f.size}" style="width:${f.size}px;height:${f.size}px;object-fit:cover;border-radius:3px">
+    </div>`
+  ).join('');
+
+  document.getElementById('app').innerHTML=`
+    <!-- ══ SCROLL SEQUENCE HERO ══ -->
+    <div id="hero-wrapper">
+      <div id="hero-scroll-space">
+        <div id="hero-sticky">
+          ${slidesHtml}
+          <div class="seq-bottom-line"></div>
+          <div class="seq-counter" id="seq-counter"><span class="seq-counter-cur">01</span> / ${String(photoCount).padStart(2,'0')}</div>
+          <div class="seq-scroll-hint">
+            <div class="seq-scroll-line"></div>
+            <span class="seq-scroll-txt">Scroll</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FLOATING TRANSITION SECTION ══ -->
+    <div class="float-section">
+      ${floatersHtml}
+      <div class="float-flash-text">
+        <span class="fft-en">Agricultural EC Platform</span>
+        <span class="fft-ja">農家の<em>情熱</em>が、<br>食卓を変える。</span>
+      </div>
+    </div>
+
+    <section id="statement" class="statement">
+      <div class="statement-inner">
+        <div class="sec-eyebrow" data-reveal>About SEN</div>
+        <h2 class="statement-h" data-reveal>農家の「本物」が、<br>スーパーに並ばない理由がある。</h2>
+        <p class="statement-body" data-reveal>生産効率を優先した流通の中で、農家の情熱や物語は消えていく。SENは農家と消費者をダイレクトにつなぎ、「誰が・どこで・どんな想いで育てたか」を一緒に届けます。</p>
+      </div>
+    </section>
+
+    <nav class="farmer-tabs" id="farmer-tabs">
+      <div class="farmer-tabs-scroll">
+        ${farmers.map(f=>`<div class="ftab" data-fid="${f.id}" onclick="scrollToId('farmer-${f.id}')">${f.name}</div>`).join('')}
+      </div>
+    </nav>
+
+    ${farmers.map(FarmerSection).join('')}
+    ${CalSection()}
+    ${MapSection()}
+
+    <section id="section-join" class="join-section">
+      <div class="join-inner">
+        <h2 class="join-h" data-reveal>農家になる</h2>
+        <p class="join-sub" data-reveal>SENのプラットフォームに参加しませんか？<br>あなたの農場の物語を、全国の食卓に届けましょう。</p>
+        <button class="btn-outline" data-reveal onclick="alert('農家の方は info@sen-ec.jp までご連絡ください（デモ版）')">お問い合わせ →</button>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-top">
+        <div>
+          <div class="footer-logo-name">SEN<sup style="font-size:.5em">®</sup></div>
+          <div class="footer-logo-sub">Agricultural EC Platform</div>
+        </div>
+        <div class="footer-links">
+          <div class="footer-group"><label>加盟農家</label>${farmers.map(f=>`<a onclick="scrollToId('farmer-${f.id}')">${f.name}</a>`).join('')}</div>
+          <div class="footer-group"><label>プラットフォーム</label><a onclick="scrollToId('statement')">この取り組みについて</a><a onclick="scrollToId('section-calendar')">旬カレンダー</a><a onclick="scrollToId('section-join')">農家になる</a></div>
+          <div class="footer-group"><label>サポート</label><a href="#">配送について</a><a href="#">ギフトについて</a><a href="#">お問い合わせ</a></div>
+        </div>
+      </div>
+      <div class="footer-btm">© 2026 SEN Agricultural EC Platform. All rights reserved.</div>
+    </footer>`;
+
+  /* スクロールシーケンス起動 */
+  if(window._seq){
+    window._seq.setHeight();
+    window._seq.listen();
   }
+  initFloaters();
+  initReveal();
+  initFarmerTabs();
+  buildNavDrop();
 }
-window.addEventListener('hashchange',router);
 
-/* ══════════════ CART MODAL ══════════════ */
-function openCart(){Cart.renderItems();document.getElementById('cart-overlay').classList.add('open');document.body.style.overflow='hidden';}
-function closeCart(){document.getElementById('cart-overlay').classList.remove('open');document.body.style.overflow='';}
-
-/* ══════════════ INIT ══════════════ */
+/* ══ INIT ══ */
 window.addEventListener('DOMContentLoaded',()=>{
   Cart.load();
   buildNavDrop();
   setTimeout(()=>{
     document.getElementById('loader').classList.add('out');
-    renderHome();
-  },1500);
+    router();
+  },1400);
 });
 </script>
+
 </body>
 </html>
