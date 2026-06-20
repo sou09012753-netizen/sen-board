@@ -5,7 +5,7 @@ import * as THREE from 'three';
 
 /* ── 実写透過PNG（背景除去済み）— パーティクル生成専用 ── */
 const VEG_PHOTOS = [
-  './assets/corn.png',
+  './assets/corn_v3.png',
   './assets/strawberry.png',
   './assets/grape.png',
   './assets/egg.png',
@@ -36,15 +36,14 @@ const FRAG = `
     float d = length(uv) * 2.0;
     if (d >= 1.0) discard;
 
-    // Layered glow: colored core → color bloom → soft halo
-    float core  = pow(max(0.0, 1.0 - d),        3.5) * 2.8;
-    float bloom = pow(max(0.0, 1.0 - d * 0.72), 1.8) * 1.2;
-    float halo  = pow(max(0.0, 1.0 - d * 0.50), 0.8) * 0.5;
+    // Sharp pixel core + visible glow — bright enough to read on black
+    float core  = pow(max(0.0, 1.0 - d),        4.5) * 4.2;
+    float bloom = pow(max(0.0, 1.0 - d * 0.60), 2.0) * 1.0;
+    float halo  = pow(max(0.0, 1.0 - d * 0.36), 0.7) * 0.22;
     float bright = core + bloom + halo;
 
-    // Slight warm highlight at very center, but keep particle color dominant
-    vec3 warm  = vec3(1.0, 0.97, 0.80);
-    vec3 col   = mix(vColor, warm, clamp(core * 0.10, 0.0, 0.45));
+    vec3 warm  = vec3(1.0, 0.92, 0.55);
+    vec3 col   = mix(vColor, warm, clamp(bright * 0.08, 0.0, 0.42));
 
     gl_FragColor = vec4(col * bright, vAlpha * min(bright, 1.0));
   }
@@ -69,12 +68,13 @@ class VegParticles {
     const H = this.H = window.innerHeight;
     const dpr = window.devicePixelRatio || 1;
 
-    /* Renderer */
+    /* Renderer — pure black background for maximum particle contrast */
     this.renderer = new THREE.WebGLRenderer({
-      canvas: this.canvas, alpha: true, antialias: false,
+      canvas: this.canvas, alpha: false, antialias: false,
       powerPreference: 'high-performance',
       preserveDrawingBuffer: true,
     });
+    this.renderer.setClearColor(0x000000, 1);
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(W, H);
 
@@ -131,7 +131,7 @@ class VegParticles {
 
   sampleImage(src, brightBoost = 1) {
     const size    = Math.round(Math.min(this.W, this.H) * 0.62);
-    const MAX_PTS = 60000;
+    const MAX_PTS = 120000;
     return new Promise(res => {
       const img = new Image();
       img.src = src;
@@ -145,17 +145,22 @@ class VegParticles {
         for (let y = 0; y < size; y += 1) {
           for (let x = 0; x < size; x += 1) {
             const i = (y * size + x) * 4;
-            if (d[i+3] > 50) {
-              // Convert to 3D world coords: center at origin, Y flipped
-              pts.push({
-                tx: x - size / 2,
-                ty: -(y - size / 2),
-                r:  Math.min(1, d[i]   * brightBoost / 255),
-                g:  Math.min(1, d[i+1] * brightBoost / 255),
-                b:  Math.min(1, d[i+2] * brightBoost / 255),
-                a:  d[i+3] / 255,
-              });
-            }
+            const r = d[i], g = d[i+1], b = d[i+2], a = d[i+3];
+            if (a < 30) continue;
+            // Skip white/gray background (high brightness + low saturation)
+            const bright = (r + g + b) / 3;
+            const sat = Math.max(r, g, b) - Math.min(r, g, b);
+            if (bright > 190 && sat < 45) continue;
+            // Skip green-dominant pixels (husks, leaves) — keep only warm/yellow tones
+            if (g > r * 1.05 && g > b * 1.3) continue;
+            pts.push({
+              tx: x - size / 2,
+              ty: -(y - size / 2),
+              r:  Math.min(1, r * brightBoost / 255),
+              g:  Math.min(1, g * brightBoost / 255),
+              b:  Math.min(1, b * brightBoost / 255),
+              a:  a / 255,
+            });
           }
         }
         if (pts.length > MAX_PTS) {
@@ -187,7 +192,7 @@ class VegParticles {
       const iy = (Math.random() - 0.5) * this.H * 0.9;
       const iz = (Math.random() - 0.5) * 500;
 
-      const sz = (1.5 + Math.random() * 1.5) * dpr; // tiny: 1.5–3px base
+      const sz = (0.9 + Math.random() * 1.1) * dpr; // 0.9–2.0px: visible crisp pixels
       const ph = Math.random() * Math.PI * 2;
       const tw = 0.5 + Math.random() * 1.5;
 
@@ -242,10 +247,10 @@ class VegParticles {
       this.points.rotation.y = Math.sin(now * 0.28) * 0.22;
       this.points.rotation.x = Math.sin(now * 0.18) * 0.08;
       this.points.rotation.z = Math.sin(now * 0.13) * 0.03;
-      // Twinkle only
+      // Subtle twinkle — keep alphas stable so pixels read clearly
       this.particles.forEach((p, i) => {
-        const tw = 0.82 + Math.sin(now * (1.2 + p.twinkle) + p.phase) * 0.18;
-        this._alpArr[i] = p.a * tw * 0.94;
+        const tw = 0.92 + Math.sin(now * (0.6 + p.twinkle * 0.4) + p.phase) * 0.08;
+        this._alpArr[i] = p.a * tw;
       });
       this.geo.attributes.aAlpha.needsUpdate = true;
     }
@@ -254,7 +259,7 @@ class VegParticles {
   draw() { this.renderer.render(this.scene, this.camera); }
 
   async cycle() {
-    const pts = await this.sampleImage(this.vegKeys[0], 1.25);
+    const pts = await this.sampleImage(this.vegKeys[0], 1.8);
     if (!pts.length) return;
     this.init(pts);
     this.state = 'converge';
@@ -360,7 +365,7 @@ function renderProducts() {
         <div class="prod-delivery">${p.delivery || '出荷時期：お問い合わせください'} · ${p.shipping || '送料別途'}</div>
         <div class="prod-bottom">
           <span class="prod-price">${fmt(p.price)}<small>/${p.unit}</small></span>
-          <button class="prod-add" data-add="${p.id}">カートに追加</button>
+          <span class="prod-soon">近日公開</span>
         </div>
       </div></div>`;
   }).join('');
@@ -386,7 +391,7 @@ function openFarmer(id) {
         <div class="fm-prod">
           <img class="fm-prod-img" src="${p.photo}" alt="${p.shortName}">
           <div><div class="fm-prod-name">${p.name}</div><div class="fm-prod-price">${fmt(p.price)} / ${p.unit}</div></div>
-          <button class="fm-prod-add" data-add="${p.id}">追加</button>
+          <span class="prod-soon" style="margin-left:auto;font-size:.66rem">近日公開</span>
         </div>`).join('')}</div>
     </div>`;
   document.getElementById('farmer-overlay').classList.add('on');
@@ -462,7 +467,8 @@ function bindEvents() {
 
   document.getElementById('cart-btn').onclick  = () => { Cart.render(); openOv('cart-overlay'); };
   document.getElementById('cart-close').onclick = () => closeOv('cart-overlay');
-  document.getElementById('cart-checkout').onclick = () => alert('デモ版です。決済システム接続予定。');
+  document.getElementById('cart-checkout').textContent = '近日公開予定';
+  document.getElementById('cart-checkout').disabled = true;
 
   document.addEventListener('click', e => {
     const add = e.target.closest('[data-add]'); if (add) { Cart.add(add.dataset.add); return; }

@@ -74,7 +74,7 @@ sup{font-size:.5em;vertical-align:super}
 #mobile-menu .mm-cta{margin-top:16px;padding:12px 32px;background:var(--gold);color:var(--hero-bg);border-radius:2px;font-size:1rem}
 
 /* ════════ HERO ════════ */
-.hero{height:100vh;min-height:640px;background:radial-gradient(ellipse 80% 65% at 62% 48%,rgba(40,72,28,.22) 0%,transparent 65%),radial-gradient(ellipse 44% 36% at 62% 48%,rgba(196,154,48,.07) 0%,transparent 55%),var(--hero-bg);position:relative;overflow:hidden}
+.hero{height:100vh;min-height:640px;background:#000;position:relative;overflow:hidden}
 #hero-canvas{position:absolute;inset:0;width:100%;height:100%}
 .hero-content{position:absolute;bottom:12%;left:7%;z-index:2;max-width:660px}
 .hero-eyebrow{font-family:var(--fl);font-size:.72rem;letter-spacing:.38em;color:rgba(196,154,48,.85);text-transform:uppercase;margin-bottom:28px;opacity:0;animation:fadeIn .8s ease 1.6s forwards}
@@ -168,6 +168,8 @@ sup{font-size:.5em;vertical-align:super}
 .prod-price small{font-family:var(--fn);font-size:.66rem;color:var(--hint);margin-left:3px}
 .prod-add{padding:9px 18px;background:var(--dark);color:#fff;font-size:.72rem;letter-spacing:.08em;border-radius:2px;transition:background .2s}
 .prod-add:hover{background:var(--green)}
+.prod-soon{padding:7px 14px;border:1px solid var(--gold);color:var(--gold2);font-size:.66rem;letter-spacing:.12em;border-radius:2px;font-family:var(--fl);font-style:italic}
+.cart-checkout:disabled{background:var(--hint);cursor:default;opacity:.7}
 
 /* ════════ MAP ════════ */
 .map-section{background:var(--cream);padding:120px 40px}
