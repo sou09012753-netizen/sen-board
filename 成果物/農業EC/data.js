@@ -1,0 +1,178 @@
+/* ════════════════════════════════════════════════
+   FARMER & PRODUCT DATA
+   農家を追加 = この配列にオブジェクトを1つ足すだけ。
+   ナビ・セクション・マップ・カート全てに自動反映される。
+   ════════════════════════════════════════════════ */
+var FARMERS = [
+  {
+    id: 'solato',
+    name: 'solato',
+    nameEn: 'Solato Farm',
+    region: '兵庫県伊丹市',
+    lat: 34.7848, lng: 135.4231,
+    catchphrase: '農業を、未来の憧れに。',
+    tagline: '子どもたちの未来に農業という選択肢を残す農園。',
+    story: '私たちは作物を売るためだけに農業をしていません。「農業って面白い」「こんな生き方もあるんだ」と感じてもらうきっかけを届けたいと思っています。伊丹でもこんなに美味しい作物が育つことを知ってもらい、子どもたちの未来に農業という選択肢を残したい。その想いを、私たちの作物と一緒に届けます。',
+    method: '毎年変わる気候や環境を記録し、植物の変化を数字で追い続けながら栽培しています。感覚だけに頼らず、予測と検証を繰り返すことで品質を高めています。手間と時間をかけて育てた作物だからこその価格です。',
+    heroPhoto: 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=1200&q=85&auto=format&fit=crop',
+    cultivationData: {
+      '栽培地域': '兵庫県伊丹市',
+      '栽培方法': 'データ記録型・特別栽培',
+      '記録年数': '5年',
+      '年間データ': '約3,650件',
+      '土壌pH': '6.0〜6.5（弱酸性）',
+    },
+    voice: {
+      photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=85&auto=format&fit=crop',
+      headline: 'データと向き合い、伊丹の大地で育てる',
+      name: '島﨑 聖菜 さん',
+    },
+    products: [
+      {
+        id: 'corn-solato',
+        name: '伊丹育ちの朝採れとうもろこしセット',
+        shortName: '朝採れとうもろこし',
+        season: '夏', price: 2980, unit: '5本セット', stock: 'limited', tag: '数量限定',
+        photo: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=800&q=85&auto=format&fit=crop',
+        desc: '朝採れ直後の甘みが詰まった5本セット。毎日の気候データを記録しながら丁寧に育てた、伊丹の大地が育む一本。',
+        delivery: '常温便 · 収穫後2日以内出荷', shipping: '送料一律660円（税込）',
+      },
+      {
+        id: 'strawberry-solato',
+        name: 'そらといちご',
+        shortName: 'そらといちご',
+        season: '春', price: 3480, unit: '4パックセット', stock: 'in_stock', tag: 'ギフト可',
+        photo: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=800&q=85&auto=format&fit=crop',
+        desc: '気候データと向き合いながら育てた伊丹の苺。甘みと酸味のバランスを追求した4パックセット。贈答用としても。',
+        delivery: '冷蔵便 · 収穫後翌日出荷', shipping: '送料一律880円（税込）',
+      },
+    ],
+  },
+  {
+    id: 'yamamoto-farm',
+    name: '山本農園',
+    nameEn: 'Yamamoto Farm',
+    region: '北海道富良野市',
+    lat: 43.3425, lng: 142.3834,
+    catchphrase: '大地の恵みを、まっすぐに。',
+    tagline: '北海道富良野の雄大な大地で30年以上、土と向き合ってきた農家です。',
+    story: '富良野の澄んだ空気と肥沃な大地で、30年以上野菜を育ててきました。農薬を極力使わない栽培にこだわり、土の力を最大限に引き出すことを使命にしています。この土地に生まれ、この土地で育ち、この土地の野菜を食卓に届けることが、私の誇りです。',
+    method: '有機肥料のみを使った土づくりから始まります。北海道の短い夏と昼夜の寒暖差を活かし、糖度の高い作物を育てます。冬の間に土を休ませ、春に丁寧に準備する——その繰り返しが味の根本です。',
+    heroPhoto: 'https://images.unsplash.com/photo-1560493676-04071c5f467b?w=1200&q=85&auto=format&fit=crop',
+    cultivationData: {
+      '栽培地域': '北海道富良野市',
+      '栽培方法': '有機肥料のみ・特別栽培',
+      '認定': '有機JAS認定',
+      '栽培年数': '30年以上',
+      '主要作物': 'じゃがいも・玉ねぎ',
+    },
+    voice: {
+      photo: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&q=85&auto=format&fit=crop',
+      headline: '土が良ければ、芋がいい。30年間、土だけを大切にしてきた',
+      name: '山本 一郎 さん',
+    },
+    products: [
+      {
+        id: 'potato-yamamoto',
+        name: '富良野の男爵いも',
+        shortName: '富良野じゃがいも',
+        season: '夏', price: 2200, unit: '3kg箱', stock: 'in_stock', tag: '定番人気',
+        photo: 'https://images.unsplash.com/photo-1508313880080-c4bef0730395?w=800&q=85&auto=format&fit=crop',
+        desc: '北海道富良野の肥沃な大地で、30年以上有機肥料だけで育てたホクホクの男爵いも。シンプルに塩ゆでするだけで、その甘みを感じられます。',
+        delivery: '常温便 · 3〜5日以内出荷', shipping: '送料一律880円（税込）',
+      },
+      {
+        id: 'onion-yamamoto',
+        name: '富良野の完熟玉ねぎ',
+        shortName: '富良野玉ねぎ',
+        season: '秋', price: 1980, unit: '2kg箱', stock: 'in_stock', tag: '新着',
+        photo: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=800&q=85&auto=format&fit=crop',
+        desc: '富良野の昼夜の寒暖差が、玉ねぎに甘みを凝縮させます。辛みが少なく、生のままスライスして食べられる甘さ。',
+        delivery: '常温便 · 3〜5日以内出荷', shipping: '送料一律660円（税込）',
+      },
+    ],
+  },
+  {
+    id: 'sunrise-orchard',
+    name: 'サンライズオーチャード',
+    nameEn: 'Sunrise Orchard',
+    region: '山梨県甲州市',
+    lat: 35.6634, lng: 138.7453,
+    catchphrase: '太陽と向き合い続けた果実。',
+    tagline: '日本一の日照を誇る山梨で、三代にわたって果実を育ててきました。',
+    story: '祖父の代から続く甲州の果樹農家です。葡萄・桃・りんごと、季節ごとに旬の果物をお届けしてきました。日本一の日照時間を誇るこの土地で、太陽と向き合い続けることが私たちの仕事です。熟れる寸前の一日に全てが決まる——その見極めに、三代かけてきました。',
+    method: '土壌分析を年4回実施し、木一本一本の状態を丁寧に管理します。剪定・摘果を繰り返し、一本の木から取れる実を最小限に絞ることで、甘みと香りを一粒に凝縮させています。',
+    heroPhoto: 'https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?w=1200&q=85&auto=format&fit=crop',
+    cultivationData: {
+      '栽培地域': '山梨県甲州市',
+      '栽培方法': '土壌分析型・特別栽培',
+      '歴史': '三代目（創業1978年）',
+      '土壌分析': '年4回実施',
+      '主要作物': 'ぶどう・桃',
+    },
+    voice: {
+      photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=85&auto=format&fit=crop',
+      headline: '一本の木から取れる実を、あえて少なくする。それが甘みの秘密',
+      name: '鈴木 朝日 さん',
+    },
+    products: [
+      {
+        id: 'grape-sunrise',
+        name: '甲州巨峰ぶどう',
+        shortName: '巨峰ぶどう',
+        season: '秋', price: 3980, unit: '2房セット', stock: 'in_stock', tag: 'ギフト可',
+        photo: 'https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=800&q=85&auto=format&fit=crop',
+        desc: '日本一の日照を誇る甲州で育てた巨峰。糖度18度以上を厳選出荷。甘みと香りが凝縮しています。贈答用の化粧箱対応。',
+        delivery: '常温便 · 収穫後2〜3日以内出荷', shipping: '送料一律880円（税込）',
+      },
+      {
+        id: 'peach-sunrise',
+        name: '甲州白桃',
+        shortName: '甲州白桃',
+        season: '夏', price: 4200, unit: '6玉セット', stock: 'in_stock', tag: 'ギフト可',
+        photo: 'https://images.unsplash.com/photo-1595475038784-bbe439ff41e6?w=800&q=85&auto=format&fit=crop',
+        desc: '山梨を代表する白桃。完熟直前に収穫し、最高の状態でお届けします。ジューシーな果肉と上品な甘み。お中元・お歳暮に。',
+        delivery: '冷蔵便 · 収穫後2〜3日以内出荷', shipping: '送料一律1,100円（税込）',
+      },
+    ],
+  },
+  {
+    id: 'tanaka-farm',
+    name: '卵の里 田中農場',
+    nameEn: 'Tanaka Egg Farm',
+    region: '岡山県真庭市',
+    lat: 35.0878, lng: 133.7625,
+    catchphrase: '鶏が笑う農場の卵。',
+    tagline: '広い鶏舎でのびのびと育てた鶏の、黄身が濃い卵をお届けします。',
+    story: '岡山県の山あいで、鶏を平飼いで育てています。鶏1羽あたりの面積を一般的な農場の5倍確保し、ストレスなく生活できる環境を整えています。鶏が幸せだと、卵もおいしい。そう信じて20年続けてきました。',
+    method: '非遺伝子組み換えの国産飼料を使用し、抗生物質は一切使いません。自然光の中で自由に動き回った鶏の卵は、黄身が濃くてコクがあります。毎朝手作業で選別し、当日または翌日発送します。',
+    heroPhoto: 'https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?w=1200&q=85&auto=format&fit=crop',
+    cultivationData: {
+      '飼育地域': '岡山県真庭市',
+      '飼育方法': '平飼い・アニマルウェルフェア',
+      '飼育面積': '一般農場の5倍',
+      '使用飼料': '国産・非遺伝子組み換え',
+      '抗生物質': '使用なし（20年間）',
+    },
+    voice: {
+      photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=85&auto=format&fit=crop',
+      headline: '鶏が笑う農場から生まれる卵。20年間、動物と向き合い続けた',
+      name: '田中 大地 さん',
+    },
+    products: [
+      {
+        id: 'egg-tanaka',
+        name: '平飼い卵 30個セット',
+        shortName: '平飼い卵',
+        season: '通年', price: 2640, unit: '30個', stock: 'in_stock', tag: '定番',
+        photo: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=800&q=85&auto=format&fit=crop',
+        desc: '岡山県の山あいで、鶏をのびのびと平飼いにした農場の卵。黄身が濃くコクが違います。TKGが別次元になります。',
+        delivery: '常温便 · 毎朝選別・翌日出荷', shipping: '送料一律660円（税込）',
+      },
+    ],
+  },
+];
+
+// 商品をフラット化（カート用）
+var PRODUCTS = {};
+FARMERS.forEach(f => (f.products || []).forEach(p => { PRODUCTS[p.id] = { ...p, farmerId: f.id }; }));
