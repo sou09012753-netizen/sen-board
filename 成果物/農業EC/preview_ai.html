@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>body{margin:0;background:#000;}canvas{display:block;}
+#info{position:fixed;top:10px;left:10px;color:#fff;font:14px monospace;background:rgba(0,0,0,0.7);padding:6px;}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="info">Loading...</div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setSize(900, 700);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+scene.add(new THREE.DirectionalLight(0xffd88a, 1.5).position.set(-3,4,5) && new THREE.DirectionalLight(0xffd88a, 1.5));
+scene.add(new THREE.AmbientLight(0x222222, 1.0));
+
+const camera = new THREE.PerspectiveCamera(42, 900/700, 0.01, 100);
+camera.position.set(0, 0, 6);
+
+const model = window.location.search === '?s' ? 'assets/strawberry_ai.glb' : 'assets/corn_ai.glb';
+new GLTFLoader().load(model, gltf => {
+  const obj = gltf.scene;
+  const box = new THREE.Box3().setFromObject(obj);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  obj.position.sub(center);
+  // fit to view: scale so tallest dimension = 3 world units
+  const maxDim = Math.max(size.x, size.y, size.z);
+  obj.scale.setScalar(3 / maxDim);
+  obj.traverse(o => { if(o.isMesh) o.material.envMapIntensity = 1.5; });
+  scene.add(obj);
+  document.getElementById('info').textContent =
+    `Size: ${size.x.toFixed(3)}×${size.y.toFixed(3)}×${size.z.toFixed(3)}  scale→${(3/maxDim).toFixed(2)}`;
+});
+
+let t = 0;
+renderer.setAnimationLoop(() => {
+  t += 0.008;
+  scene.children.forEach(c => { if(c.isGroup||c.children?.length) c.rotation.y = t*0.3; });
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>
