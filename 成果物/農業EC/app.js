@@ -1,5 +1,5 @@
 /* ════════════════════════════════════════════════
-   SEN — APP LOGIC (Three.js 3D vegetable scene)
+   SEN — APP LOGIC (Three.js particle vegetable scene)
    ════════════════════════════════════════════════ */
 import * as THREE from 'three';
 import { EffectComposer }   from 'three/addons/postprocessing/EffectComposer.js';
@@ -8,69 +8,92 @@ import { UnrealBloomPass }  from 'three/addons/postprocessing/UnrealBloomPass.js
 import { RoomEnvironment }  from 'three/addons/environments/RoomEnvironment.js';
 import { GLTFLoader }       from 'three/addons/loaders/GLTFLoader.js';
 
-/* ════════ 1. 3D VEGETABLE SCENE ════════ */
+/* ════════ 1. PARTICLE VEGETABLE SCENE ════════ */
+
+const N_PTC        = 7000;  // 粒子数
+const ASSEMBLE_MS  = 2600;  // 散乱→集合
+const HOLD_MS      = 5000;  // 集合保持
+const DISSOLVE_MS  = 1800;  // 集合→散乱
+const SCATTER_MS   = 900;   // 次モデルへの過渡期
+
 class VegScene3D {
   constructor(canvas) {
     this.canvas = canvas;
-    this.W = 0; this.H = 0;
+    this.W = this.H = 0;
     this.t = 0;
-    this.currentGroup = null;
-    this.composer = null;
     this._mx = 0; this._my = 0;
+
+    /* 粒子バッファ */
+    this.curPos  = new Float32Array(N_PTC * 3); // 毎フレーム更新
+    this.fromPos = null;  // フェーズ開始時スナップショット
+    this.toPos   = null;  // 補間先
+
+    /* 散乱軌道パラメータ: θ, r, dy, dr_drift */
+    this.scP  = new Float32Array(N_PTC * 4);
+    this.posX = 1.65;
+
+    /* プリロード済みモデルデータ */
+    this.models   = [];
+    this.modelIdx = 0;
+
+    /* フェーズ状態機械 */
+    this.phase    = 'scatter';
+    this.phaseT0  = 0;
+    this.phaseDur = 99999;
+
+    /* マウス反発用変位バッファ（hold中のみ使用） */
+    this._disp = new Float32Array(N_PTC * 3);
+
+    /* Three.js オブジェクト */
+    this.posAttr  = null;
+    this.colAttr  = null;
+    this.pts      = null;
+    this.composer = null;
   }
 
+  /* ── 丸い光点テクスチャ ──────────────────────── */
+  _makeCircleTex() {
+    const sz  = 64;
+    const cv  = document.createElement('canvas');
+    cv.width  = cv.height = sz;
+    const ctx = cv.getContext('2d');
+    const g   = ctx.createRadialGradient(sz/2, sz/2, 0, sz/2, sz/2, sz/2);
+    g.addColorStop(0,   'rgba(255,255,255,1.0)');
+    g.addColorStop(0.35,'rgba(255,255,255,0.85)');
+    g.addColorStop(0.7, 'rgba(255,255,255,0.25)');
+    g.addColorStop(1,   'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, sz, sz);
+    return new THREE.CanvasTexture(cv);
+  }
+
+  /* ── レンダラー・シーン初期化 ─────────────────── */
   _init() {
     const W = this.W = window.innerWidth;
     const H = this.H = window.innerHeight;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true, powerPreference: 'high-performance' });
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: this.canvas, antialias: true,
+      powerPreference: 'high-performance',
+    });
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(W, H);
     this.renderer.setClearColor(0x000000, 1);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 0.80;
+    this.renderer.toneMappingExposure = 0.95;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.scene = new THREE.Scene();
 
-    // IBL環境マップ (RoomEnvironment = 室内光のIBL)
     const pmrem = new THREE.PMREMGenerator(this.renderer);
     this.scene.environment = pmrem.fromScene(new RoomEnvironment(this.renderer), 0.04).texture;
 
     this.camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100);
     this.camera.position.set(0, 0, 6);
 
-    // キーライト: 暖かい白, 左上前から
-    const key = new THREE.DirectionalLight(0xffd88a, 1.5);
-    key.position.set(-3, 4, 5);
-    key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
-    key.shadow.camera.near = 0.5; key.shadow.camera.far = 20;
-    this.scene.add(key);
-
-    // フィルライト: 涼しい青, 右から
-    const fill = new THREE.DirectionalLight(0x88aaff, 0.6);
-    fill.position.set(5, -1, 2);
-    this.scene.add(fill);
-
-    // リムライト: 背面からの縁取り
-    const rim = new THREE.PointLight(0xaadcff, 1.2, 20);
-    rim.position.set(1.5, 1.5, -5);
-    this.scene.add(rim);
-
-    // 下からの反射光 (地面からの跳ね返り)
-    const bounce = new THREE.PointLight(0xffd080, 0.5, 12);
-    bounce.position.set(0, -4, 2);
-    this.scene.add(bounce);
-
-    this.scene.add(new THREE.AmbientLight(0x111111, 1.0));
-
-    // ポストプロセス: ブルーム
-    const rp = new RenderPass(this.scene, this.camera);
-    const bloom = new UnrealBloomPass(new THREE.Vector2(W, H), 0.10, 0.3, 0.96);
+    const rp    = new RenderPass(this.scene, this.camera);
+    const bloom = new UnrealBloomPass(new THREE.Vector2(W, H), 0.38, 0.55, 0.78);
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(rp);
     this.composer.addPass(bloom);
@@ -80,6 +103,36 @@ class VegScene3D {
       this._mx = (e.clientX / this.W - 0.5) * 2;
       this._my = (e.clientY / this.H - 0.5) * 2;
     }, { passive: true });
+
+    /* 散乱軌道を初期化 */
+    this._resetScatter();
+
+    /* Points オブジェクト生成 */
+    const geo    = new THREE.BufferGeometry();
+    this.posAttr = new THREE.BufferAttribute(this.curPos, 3);
+    this.posAttr.setUsage(THREE.DynamicDrawUsage);
+
+    const col    = new Float32Array(N_PTC * 3).fill(0.55);
+    this.colAttr = new THREE.BufferAttribute(col, 3);
+    this.colAttr.setUsage(THREE.DynamicDrawUsage);
+
+    geo.setAttribute('position', this.posAttr);
+    geo.setAttribute('color',    this.colAttr);
+
+    this.pts = new THREE.Points(geo, new THREE.PointsMaterial({
+      size:            0.028,
+      map:             this._makeCircleTex(),
+      vertexColors:    true,
+      transparent:     true,
+      opacity:         0.95,
+      depthWrite:      false,
+      blending:        THREE.AdditiveBlending,
+      sizeAttenuation: true,
+      alphaTest:       0.001,
+    }));
+    this.scene.add(this.pts);
+
+    this.phaseT0  = performance.now();
   }
 
   _resize() {
@@ -92,344 +145,299 @@ class VegScene3D {
     this.composer.setSize(this.W, this.H);
   }
 
-  // ── とうもろこし ──────────────────────────────────
-  _buildCorn() {
-    const g = new THREE.Group();
-    const ROWS = 20, COLS = 13;
-    const cobH = 2.4;
-
-    for (let row = 0; row < ROWS; row++) {
-      const t = row / (ROWS - 1);
-      const profile = Math.sin(t * Math.PI);
-      const R = 0.46 + profile * 0.20;
-      const y = (t - 0.5) * cobH;
-      // 色: 上部は黄緑, 下部は濃い金色 (lightness低めでACESトーンマップ後もゴールデン)
-      const hue   = 0.14 - t * 0.05;
-      const light = 0.26 + profile * 0.10;
-      const baseCol = new THREE.Color().setHSL(hue, 0.92, light);
-
-      for (let col = 0; col < COLS; col++) {
-        const angle = (col / COLS) * Math.PI * 2 + (row % 2 === 0 ? 0 : Math.PI / COLS);
-        const kGeo  = new THREE.SphereGeometry(0.085, 9, 7);
-        kGeo.scale(1.1, 1.4, 0.82); // 縦長の楕円カーネル
-        const kCol = baseCol.clone().multiplyScalar(0.82 + Math.random() * 0.36);
-        const kMat = new THREE.MeshStandardMaterial({ color: kCol, roughness: 0.80, metalness: 0.0 });
-        const kernel = new THREE.Mesh(kGeo, kMat);
-        kernel.position.set(R * Math.cos(angle), y, R * Math.sin(angle));
-        kernel.lookAt(new THREE.Vector3(R * Math.cos(angle) * 3, y, R * Math.sin(angle) * 3));
-        kernel.castShadow = true;
-        g.add(kernel);
-      }
-    }
-
-    // 先端キャップ
-    const tipMat = new THREE.MeshStandardMaterial({ color: 0x8a6408, roughness: 0.75 });
-    const topTip = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 8), tipMat);
-    topTip.scale.set(1, 1.7, 1);
-    topTip.position.y = cobH * 0.5 + 0.12;
-    const botTip = topTip.clone(); botTip.position.y = -cobH * 0.5 - 0.12;
-    g.add(topTip, botTip);
-
-    // 緑の葉（3枚）
-    const huskMat = new THREE.MeshStandardMaterial({ color: 0x4a9020, roughness: 0.8, side: THREE.DoubleSide });
-    for (let i = 0; i < 3; i++) {
-      const a = (i / 3) * Math.PI * 2;
-      const pts = Array.from({ length: 12 }, (_, j) => {
-        const s = j / 11;
-        return new THREE.Vector3(
-          Math.cos(a) * (0.28 + s * 0.55) + Math.sin(s * Math.PI) * 0.18 * Math.cos(a + Math.PI / 2),
-          cobH * 0.48 + s * 1.1 + Math.pow(s, 1.5) * 0.3,
-          Math.sin(a) * (0.28 + s * 0.55) + Math.sin(s * Math.PI) * 0.18 * Math.sin(a + Math.PI / 2)
-        );
-      });
-      const leaf = new THREE.Mesh(
-        new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 14, 0.055, 5, false),
-        huskMat
-      );
-      leaf.castShadow = true;
-      g.add(leaf);
-    }
-
-    // シルク（ひげ）
-    const silkMat = new THREE.MeshStandardMaterial({ color: 0xf0d060, roughness: 1.0 });
-    for (let i = 0; i < 10; i++) {
-      const rx = (Math.random() - 0.5) * 0.18, rz = (Math.random() - 0.5) * 0.18;
-      const h = 0.35 + Math.random() * 0.55;
-      const silk = new THREE.Mesh(
-        new THREE.TubeGeometry(new THREE.CatmullRomCurve3([
-          new THREE.Vector3(rx, cobH * 0.5 + 0.22, rz),
-          new THREE.Vector3(rx * 1.8 + 0.08, cobH * 0.5 + 0.22 + h * 0.5, rz * 1.8),
-          new THREE.Vector3(rx * 2.8 + 0.18, cobH * 0.5 + 0.22 + h, rz * 2.8),
-        ]), 8, 0.010, 4, false),
-        silkMat
-      );
-      g.add(silk);
-    }
-
-    g.scale.setScalar(0.28);
-    g.position.set(1.8, -0.20, 0);
-    return g;
-  }
-
-  // ── いちご ───────────────────────────────────────
-  _buildStrawberry() {
-    const g = new THREE.Group();
-
-    // 本体 (LatheGeometry で回転体)
-    const profile = [
-      new THREE.Vector2(0.00, -1.35), new THREE.Vector2(0.18, -1.05),
-      new THREE.Vector2(0.60, -0.50), new THREE.Vector2(0.92, 0.05),
-      new THREE.Vector2(1.00, 0.50),  new THREE.Vector2(0.92, 0.90),
-      new THREE.Vector2(0.75, 1.18),  new THREE.Vector2(0.50, 1.38),
-      new THREE.Vector2(0.22, 1.50),  new THREE.Vector2(0.00, 1.55),
-    ];
-    const bodyGeo = new THREE.LatheGeometry(profile, 52);
-    const bodyMat = new THREE.MeshStandardMaterial({ color: 0xc80e1c, roughness: 0.68, metalness: 0.02 });
-    const body = new THREE.Mesh(bodyGeo, bodyMat);
-    body.castShadow = true;
-    body.receiveShadow = true;
-    g.add(body);
-
-    // 種 (surface seeds)
-    const seedMat = new THREE.MeshStandardMaterial({ color: 0xf0d848, roughness: 0.5 });
-    let rngS = 54321;
-    const rnd = () => { rngS = (rngS * 1664525 + 1013904223) >>> 0; return rngS / 0xffffffff; };
-
-    for (let i = 0; i < 90; i++) {
-      const t   = rnd() * 0.9;
-      const phi = rnd() * Math.PI * 2;
-      const pi  = Math.min(profile.length - 2, Math.floor(t * (profile.length - 1)));
-      const frac = t * (profile.length - 1) - pi;
-      const r = profile[pi].x * (1 - frac) + profile[pi + 1].x * frac;
-      const y = profile[pi].y * (1 - frac) + profile[pi + 1].y * frac;
-      if (r < 0.1) continue;
-      const seed = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 5), seedMat);
-      seed.position.set(r * Math.cos(phi), y, r * Math.sin(phi));
-      seed.scale.z = 0.5;
-      seed.lookAt(new THREE.Vector3(r * Math.cos(phi) * 3, y, r * Math.sin(phi) * 3));
-      g.add(seed);
-    }
-
-    // がく (5枚の葉)
-    const calyxMat = new THREE.MeshStandardMaterial({ color: 0x2a8018, roughness: 0.75, side: THREE.DoubleSide });
-    for (let i = 0; i < 5; i++) {
-      const a = (i / 5) * Math.PI * 2;
-      const pts = [
-        new THREE.Vector3(0, 1.55, 0),
-        new THREE.Vector3(Math.cos(a) * 0.35, 1.68, Math.sin(a) * 0.35),
-        new THREE.Vector3(Math.cos(a) * 0.72, 1.92, Math.sin(a) * 0.72),
-        new THREE.Vector3(Math.cos(a) * 0.88, 2.18, Math.sin(a) * 0.88),
-      ];
-      const leaf = new THREE.Mesh(
-        new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 12, 0.058, 5, false),
-        calyxMat
-      );
-      leaf.castShadow = true;
-      g.add(leaf);
-    }
-
-    // 軸
-    const stem = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.038, 0.055, 0.42, 8),
-      new THREE.MeshStandardMaterial({ color: 0x507028, roughness: 0.9 })
-    );
-    stem.position.y = 1.77;
-    g.add(stem);
-
-    g.scale.setScalar(0.30);
-    g.position.set(1.6, -0.15, 0);
-    return g;
-  }
-
-  // ── アニメーション補助 ──────────────────────────
-  _tween(ms, fn) {
-    return new Promise(res => {
-      const t0 = performance.now();
-      const tick = now => {
-        const p = Math.min(1, (now - t0) / ms);
-        fn(p);
-        if (p < 1) requestAnimationFrame(tick); else res();
-      };
-      requestAnimationFrame(tick);
-    });
-  }
-
-  async _animIn(group) {
-    group.scale.setScalar(0.001);
-    this.scene.add(group);
-    this.currentGroup = group;
-    await this._tween(900, p => {
-      const s = 1 - Math.pow(1 - p, 3); // ease-out cubic
-      group.scale.setScalar(0.001 + s * 0.999);
-    });
-  }
-
-  async _animOut(group) {
-    await this._tween(650, p => {
-      group.scale.setScalar(Math.max(0, 1 - p * p * p));
-    });
-    if (group._vortex) this.scene.remove(group._vortex);
-    this.scene.remove(group);
-    this.currentGroup = null;
-  }
-
-  // ── 3Dミニチュア渦パーティクル ──────────────────
-  // sourceScene: GLBシーンのクローン（ジオメトリ・マテリアルを共有）
-  _buildVortex3D(sourceScene, posX) {
-    const group = new THREE.Group();
-    const N = 55;
-    const instances = [];
-
-    for (let i = 0; i < N; i++) {
-      const mini = sourceScene.clone(true); // ジオメトリ/マテリアルはGPU共有
-      const theta = Math.random() * Math.PI * 2;
-      const r     = 0.6 + Math.random() * 3.2;
-      const y     = (Math.random() - 0.5) * 5.0;
-      const sc    = 0.055 + Math.random() * 0.080; // 自然サイズの5.5〜13.5%
-
-      mini.scale.setScalar(sc);
-      mini.position.set(posX + Math.cos(theta) * r, y, Math.sin(theta) * r);
-      mini.rotation.set(
-        Math.random() * Math.PI * 2,
-        Math.random() * Math.PI * 2,
-        Math.random() * Math.PI * 2
-      );
-
-      instances.push({
-        obj:   mini,
-        theta, r,
-        drdt:  0.003 + Math.random() * 0.007,   // 外向きドリフト
-        dy:    (Math.random() - 0.5) * 0.007,   // 上下ドリフト
-        rx:    (Math.random() - 0.5) * 0.045,   // 個別スピン
-        ry:    (Math.random() - 0.5) * 0.055,
-        rz:    (Math.random() - 0.5) * 0.030,
-      });
-      group.add(mini);
-    }
-
-    group.userData = { instances, posX };
-    return group;
-  }
-
-  _updateVortex(vortexGroup) {
-    const { instances, posX } = vortexGroup.userData;
-    const boost    = vortexGroup.userData.mouseBoost || 1.0;
-    const angSpeed = 0.007 * boost;
-
-    for (const inst of instances) {
-      // 渦巻き: 中心ほど速く回る
-      inst.theta += angSpeed * (1.8 / (inst.r + 0.5));
-      inst.r     += inst.drdt * boost * 0.5;
-      inst.obj.position.y += inst.dy;
-
-      inst.obj.position.x = posX + Math.cos(inst.theta) * inst.r;
-      inst.obj.position.z = Math.sin(inst.theta) * inst.r;
-
-      // 個別回転
-      inst.obj.rotation.x += inst.rx;
-      inst.obj.rotation.y += inst.ry;
-      inst.obj.rotation.z += inst.rz;
-
-      // 外に出たら中心付近にリセット
-      if (inst.r > 4.5 || Math.abs(inst.obj.position.y) > 3.5) {
-        inst.theta = Math.random() * Math.PI * 2;
-        inst.r     = 0.1 + Math.random() * 0.35;
-        inst.obj.position.y = (Math.random() - 0.5) * 1.8;
-      }
+  /* ── 散乱軌道パラメータ初期化 ────────────────── */
+  /* 軌道中心をx=0（画面中央）にして画面外に出ないようにする。
+     カメラz=6, fov=42°の視野: 横±3.7, 縦±2.3 world units */
+  _resetScatter() {
+    for (let i = 0; i < N_PTC; i++) {
+      const th = Math.random() * Math.PI * 2;
+      const r  = 0.2 + Math.random() * 3.2; // max r=3.4 → 画面内に収まる
+      const y  = (Math.random() - 0.5) * 4.2;
+      this.scP[i*4]   = th;
+      this.scP[i*4+1] = r;
+      this.scP[i*4+2] = (Math.random() - 0.5) * 0.006;
+      this.scP[i*4+3] = 0.002 + Math.random() * 0.005; // ドリフト抑制
+      this.curPos[i*3]   = Math.cos(th) * r;  // x=0中心
+      this.curPos[i*3+1] = y;
+      this.curPos[i*3+2] = Math.sin(th) * r;
     }
   }
 
-  // ── GLBロード ────────────────────────────────
-  _loadGLB(url, scale, posX, innerOffsetY = 0) {
+  /* ── GLBサーフェスをN_PTC点サンプリング ──────── */
+  async _sampleGLB(url, scale, posX, offsetY) {
     return new Promise((resolve, reject) => {
-      const loader = new GLTFLoader();
-      loader.load(url, gltf => {
+      new GLTFLoader().load(url, gltf => {
         const g = gltf.scene;
 
-        // 色彩強化（マテリアル共有のためクローン前に適用）
+        /* センタリング＋スケール */
+        const box = new THREE.Box3().setFromObject(g);
+        const ctr = box.getCenter(new THREE.Vector3());
+        g.position.sub(ctr);
+        g.position.y += offsetY;
+        g.scale.setScalar(scale);
+        g.updateMatrixWorld(true);
+
+        /* テクスチャ → ピクセルデータをキャッシュ */
+        const texCache = new Map();
         g.traverse(o => {
-          if (o.isMesh && o.material) {
-            [].concat(o.material).forEach(m => {
-              m.envMapIntensity = 2.2;
-              if (m.color) {
-                const hsl = {};
-                m.color.getHSL(hsl);
-                if (hsl.s > 0.08) {
-                  m.color.setHSL(hsl.h, Math.min(1.0, hsl.s * 1.9), hsl.l * 0.76);
-                }
-              }
-              m.needsUpdate = true;
-            });
-          }
+          if (!o.isMesh) return;
+          const mat = [].concat(o.material)[0];
+          if (!mat?.map?.image) return;
+          const uuid = mat.map.uuid;
+          if (texCache.has(uuid)) return;
+          const img = mat.map.image;
+          const tw  = img.width  || img.naturalWidth  || 512;
+          const th2 = img.height || img.naturalHeight || 512;
+          const cv  = document.createElement('canvas');
+          cv.width = tw; cv.height = th2;
+          const ctx = cv.getContext('2d');
+          ctx.drawImage(img, 0, 0, tw, th2);
+          texCache.set(uuid, { px: ctx.getImageData(0, 0, tw, th2).data, tw, th: th2 });
         });
 
-        // マテリアル適用後にクローン（パーティクルは同じマテリアルを共有）
-        const particleSource = g.clone(true);
+        /* メッシュ収集 */
+        const meshes = [];
+        g.traverse(o => { if (o.isMesh && o.geometry) meshes.push(o); });
 
-        // メイン表示モデルの配置
-        const box    = new THREE.Box3().setFromObject(g);
-        const center = box.getCenter(new THREE.Vector3());
-        g.position.sub(center);
-        g.position.y += innerOffsetY;
-        g.scale.setScalar(scale);
+        /* サンプリング */
+        const positions = new Float32Array(N_PTC * 3);
+        const colors    = new Float32Array(N_PTC * 3);
 
-        const wrapper = new THREE.Group();
-        wrapper.add(g);
-        wrapper.position.set(posX, 0, 0);
+        for (let s = 0; s < N_PTC; s++) {
+          const o   = meshes[Math.floor(Math.random() * meshes.length)];
+          const geo = o.geometry;
+          const pA  = geo.attributes.position;
+          const uvA = geo.attributes.uv;
+          const idx = geo.index;
+          const mat = [].concat(o.material)[0];
 
-        // 3Dミニチュア渦パーティクルをシーンに追加
-        const vortex = this._buildVortex3D(particleSource, posX);
-        this.scene.add(vortex);
-        wrapper._vortex = vortex;
+          const tCnt = idx ? idx.count / 3 : pA.count / 3;
+          const tri  = Math.floor(Math.random() * tCnt);
+          let a, b, c;
+          if (idx) {
+            a = idx.getX(tri*3); b = idx.getX(tri*3+1); c = idx.getX(tri*3+2);
+          } else {
+            a = tri*3; b = tri*3+1; c = tri*3+2;
+          }
 
-        resolve(wrapper);
+          /* 重心座標でランダム点 */
+          let r1 = Math.random(), r2 = Math.random();
+          if (r1 + r2 > 1) { r1 = 1-r1; r2 = 1-r2; }
+          const r3 = 1 - r1 - r2;
+
+          /* ローカル座標 → ワールド座標 */
+          const lx = pA.getX(a)*r3 + pA.getX(b)*r1 + pA.getX(c)*r2;
+          const ly = pA.getY(a)*r3 + pA.getY(b)*r1 + pA.getY(c)*r2;
+          const lz = pA.getZ(a)*r3 + pA.getZ(b)*r1 + pA.getZ(c)*r2;
+          const wp  = new THREE.Vector3(lx, ly, lz).applyMatrix4(o.matrixWorld);
+
+          positions[s*3]   = wp.x + posX;
+          positions[s*3+1] = wp.y;
+          positions[s*3+2] = wp.z;
+
+          /* テクスチャカラーをサンプル */
+          let r = 0.8, gg = 0.8, bl = 0.8;
+          if (uvA && mat?.map) {
+            const tx = texCache.get(mat.map.uuid);
+            if (tx) {
+              const u  = uvA.getX(a)*r3 + uvA.getX(b)*r1 + uvA.getX(c)*r2;
+              const v  = uvA.getY(a)*r3 + uvA.getY(b)*r1 + uvA.getY(c)*r2;
+              const px = Math.min(tx.tw-1, Math.max(0, Math.floor(u * tx.tw)));
+              const py = Math.min(tx.th-1, Math.max(0, Math.floor((1-v) * tx.th)));
+              const pi = (py * tx.tw + px) * 4;
+              /* 彩度ブースト */
+              const col = new THREE.Color(tx.px[pi]/255, tx.px[pi+1]/255, tx.px[pi+2]/255);
+              const hsl = {}; col.getHSL(hsl);
+              if (hsl.s > 0.03) col.setHSL(hsl.h, Math.min(1, hsl.s * 3.2), Math.min(0.82, hsl.l * 1.2));
+              r = col.r; gg = col.g; bl = col.b;
+            }
+          } else if (mat?.color) {
+            r = mat.color.r; gg = mat.color.g; bl = mat.color.b;
+          }
+          colors[s*3] = r; colors[s*3+1] = gg; colors[s*3+2] = bl;
+        }
+
+        resolve({ positions, colors, posX });
       }, undefined, reject);
     });
   }
 
-  // ── メインループ ────────────────────────────────
-  async cycle() {
-    const builders = [
-      () => this._loadGLB('assets/corn_ai.glb',       3.2, 1.6, -0.5),
-      () => this._loadGLB('assets/strawberry_ai.glb', 3.0, 1.7, -0.2),
-    ];
-    let idx = 0;
-    while (true) {
-      let group;
-      try {
-        group = await builders[idx % builders.length]();
-      } catch(e) {
-        group = idx % 2 === 0 ? this._buildCorn() : this._buildStrawberry();
+  /* ── フェーズ遷移 ────────────────────────────── */
+  _ease(t) {
+    return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+  }
+
+  _setPhase(name, dur) {
+    this.phase    = name;
+    this.phaseT0  = performance.now();
+    this.phaseDur = dur;
+
+    if (name === 'assemble' || name === 'dissolve') {
+      this.fromPos = this.curPos.slice();
+      this._disp.fill(0);
+    }
+    if (name === 'dissolve') {
+      /* 散乱先を生成（x=0中心・画面内） */
+      this.toPos = new Float32Array(N_PTC * 3);
+      for (let i = 0; i < N_PTC; i++) {
+        const th = Math.random() * Math.PI * 2;
+        const r  = 0.3 + Math.random() * 3.2;
+        this.toPos[i*3]   = Math.cos(th) * r;  // x=0中心
+        this.toPos[i*3+1] = (Math.random() - 0.5) * 4.2;
+        this.toPos[i*3+2] = Math.sin(th) * r;
       }
-      idx++;
-      await this._animIn(group);
-      await wait(5500);
-      await this._animOut(group);
-      await wait(400);
     }
   }
 
-  update() {
-    this.t += 0.007;
-    if (this.currentGroup) {
-      // マウスで大きく傾く (感度UP)
-      const targetRX = this._my * -0.35;
-      const targetRY = this._mx * 0.40 + this.t * 0.20;
-      this.currentGroup.rotation.x += (targetRX - this.currentGroup.rotation.x) * 0.06;
-      this.currentGroup.rotation.y += (targetRY - this.currentGroup.rotation.y) * 0.06;
-      // 上下浮遊 + マウスで少し上下移動
-      const floatTarget = Math.sin(this.t * 0.6) * 0.12 + this._my * -0.18;
-      this.currentGroup.position.y += (floatTarget - this.currentGroup.position.y) * 0.07;
-      // X方向もマウスに追従
-      const baseX = this.currentGroup._baseX || this.currentGroup.position.x;
-      this.currentGroup._baseX = baseX;
-      this.currentGroup.position.x += (baseX + this._mx * 0.18 - this.currentGroup.position.x) * 0.05;
-      // 渦パーティクル: マウスに反応して渦の回転速度が変わる
-      if (this.currentGroup._vortex) {
-        this.currentGroup._vortex.userData.mouseBoost = 1.0 + Math.abs(this._mx) * 0.8 + Math.abs(this._my) * 0.8;
-        this._updateVortex(this.currentGroup._vortex);
+  _applyColors(colors) {
+    const ca = this.colAttr.array;
+    for (let i = 0; i < N_PTC * 3; i++) ca[i] = colors[i];
+    this.colAttr.needsUpdate = true;
+  }
+
+  /* ── メインサイクル ──────────────────────────── */
+  async cycle() {
+    const cfgs = [
+      { url: 'assets/corn_ai.glb',       scale: 3.2, posX: 1.6,  offsetY: -0.5 },
+      { url: 'assets/strawberry_ai.glb', scale: 3.0, posX: 1.65, offsetY: -0.2 },
+    ];
+
+    /* プリロード（両モデルを順次読み込み） */
+    for (const cfg of cfgs) {
+      try {
+        const m = await this._sampleGLB(cfg.url, cfg.scale, cfg.posX, cfg.offsetY);
+        this.models.push(m);
+      } catch(e) {
+        console.warn('GLB load failed:', cfg.url, e);
+        this.models.push(null);
       }
     }
+
+    /* サイクルループ */
+    while (true) {
+      const m = this.models[this.modelIdx % this.models.length];
+      this.modelIdx++;
+      if (!m) { await wait(1000); continue; }
+
+      this.posX = m.posX;
+      this._applyColors(m.colors);
+
+      /* 散乱: 粒子が渦巻く */
+      this._setPhase('scatter', SCATTER_MS);
+      await wait(SCATTER_MS);
+
+      /* 集合: 散乱→野菜の形 */
+      this.toPos = m.positions;
+      this._setPhase('assemble', ASSEMBLE_MS);
+      await wait(ASSEMBLE_MS + 200);
+
+      /* 保持: 野菜の形で静止・呼吸（マウスで一部散乱） */
+      this._setPhase('hold', HOLD_MS);
+      await wait(HOLD_MS);
+
+      /* 解散: 野菜の形→散乱 */
+      this._setPhase('dissolve', DISSOLVE_MS);
+      await wait(DISSOLVE_MS + 200);
+
+      /* 散乱パラメータを解散後の位置に同期（x=0中心） */
+      for (let i = 0; i < N_PTC; i++) {
+        const x = this.curPos[i*3];  // x=0中心なのでそのまま使う
+        const z = this.curPos[i*3+2];
+        const r = Math.sqrt(x*x + z*z);
+        this.scP[i*4]   = Math.atan2(z, x);
+        this.scP[i*4+1] = Math.max(0.1, r);
+      }
+    }
+  }
+
+  /* ── 毎フレーム更新 ──────────────────────────── */
+  update() {
+    this.t += 0.007;
+    const elapsed = performance.now() - this.phaseT0;
+    const p       = this._ease(Math.min(1, elapsed / this.phaseDur));
+    const boost   = 1 + Math.abs(this._mx) * 0.9 + Math.abs(this._my) * 0.9;
+
+    /* ── 散乱フェーズ: 渦巻き軌道（x=0中心・画面内） ── */
+    if (this.phase === 'scatter') {
+      const ang = 0.008 * boost;
+      for (let i = 0; i < N_PTC; i++) {
+        const r = this.scP[i*4+1];
+        this.scP[i*4]      += ang * (1.5 / (r + 0.4));
+        this.scP[i*4+1]    += this.scP[i*4+3] * boost * 0.3;
+        this.curPos[i*3+1] += this.scP[i*4+2];
+        this.curPos[i*3]    = Math.cos(this.scP[i*4]) * this.scP[i*4+1]; // x=0中心
+        this.curPos[i*3+2]  = Math.sin(this.scP[i*4]) * this.scP[i*4+1];
+        // 画面内リセット（横±3.5, 縦±2.4）
+        if (this.scP[i*4+1] > 3.5 || Math.abs(this.curPos[i*3+1]) > 2.4) {
+          this.scP[i*4]      = Math.random() * Math.PI * 2;
+          this.scP[i*4+1]    = Math.random() * 0.4;
+          this.curPos[i*3+1] = (Math.random() - 0.5) * 1.2;
+        }
+      }
+      this.posAttr.needsUpdate = true;
+    }
+
+    /* ── 集合フェーズ: 散乱位置→サーフェス位置 ── */
+    else if (this.phase === 'assemble') {
+      const f = this.fromPos, to = this.toPos;
+      for (let i = 0; i < N_PTC * 3; i++) this.curPos[i] = f[i] * (1-p) + to[i] * p;
+      this.posAttr.needsUpdate = true;
+    }
+
+    /* ── 保持フェーズ: 呼吸 + マウス近傍だけ局所散乱 ── */
+    else if (this.phase === 'hold' && this.toPos) {
+      const halfH    = Math.tan(21 * Math.PI / 180) * 6;
+      const halfW    = halfH * (this.W / this.H);
+      const mwx      = this._mx * halfW;
+      const mwy      = -this._my * halfH;
+      const RADIUS   = 0.90;   // 影響半径 (world units)
+      const STRENGTH = 0.11;   // フレームあたり押し出し強度
+      const DAMPING  = 0.86;   // 減衰（約0.3sで元位置に戻る）
+      const amp      = 0.006;
+
+      for (let i = 0; i < N_PTC; i++) {
+        /* 呼吸振動 */
+        const ph = (i * 2.39996) % (Math.PI * 2);
+        const w  = Math.sin(this.t * 2.0 + ph) * amp;
+        const tx = this.toPos[i*3]   + w * Math.cos(ph);
+        const ty = this.toPos[i*3+1] + w * Math.sin(ph);
+        const tz = this.toPos[i*3+2] + w * 0.4;
+
+        /* カーソル近傍の粒子を外側に押し出す */
+        const dx   = tx - mwx;
+        const dy   = ty - mwy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < RADIUS && dist > 0.001) {
+          const f = STRENGTH * Math.pow(1 - dist / RADIUS, 2);
+          this._disp[i*3]   += (dx / dist) * f;
+          this._disp[i*3+1] += (dy / dist) * f;
+        }
+
+        /* 全粒子の変位を減衰（カーソルが離れると元の位置に戻る） */
+        this._disp[i*3]   *= DAMPING;
+        this._disp[i*3+1] *= DAMPING;
+        this._disp[i*3+2] *= DAMPING;
+
+        this.curPos[i*3]   = tx + this._disp[i*3];
+        this.curPos[i*3+1] = ty + this._disp[i*3+1];
+        this.curPos[i*3+2] = tz + this._disp[i*3+2];
+      }
+      this.posAttr.needsUpdate = true;
+    }
+
+    /* ── 解散フェーズ: サーフェス位置→散乱 ── */
+    else if (this.phase === 'dissolve') {
+      const f = this.fromPos, to = this.toPos;
+      for (let i = 0; i < N_PTC * 3; i++) this.curPos[i] = f[i] * (1-p) + to[i] * p;
+      this.posAttr.needsUpdate = true;
+    }
+
+    /* 非常に微妙なカメラ傾き（右に飛ばないよう自動回転なし） */
+    const tx = this._my * -0.025;
+    const ty = this._mx *  0.030;
+    this.camera.rotation.x += (tx - this.camera.rotation.x) * 0.03;
+    this.camera.rotation.y += (ty - this.camera.rotation.y) * 0.03;
+
     this.composer.render();
   }
 

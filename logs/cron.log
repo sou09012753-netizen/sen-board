@@ -32,3 +32,19 @@ fatal: could not read Username for 'https://github.com': Device not configured
 [02:01] 2. EC戦略 完了
 [02:02] 3. スケの営業進捗 完了
 [02:02] 4. チーム状況 完了
+[main 7c8e571] auto: 2026-06-21 夜間リサーチ
+ 15 files changed, 919 insertions(+), 233 deletions(-)
+ create mode 100644 "logs/2026-06/2026-06-21_\345\244\234\351\226\223\343\203\252\343\202\265\343\203\274\343\203\201.md"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/assets/corn.glb"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/assets/corn_ai.glb"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/assets/corn_photo.png"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/assets/corn_v4.png"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/assets/strawberry.glb"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/assets/strawberry_ai.glb"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/assets/strawberry_v2.png"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/preview_ai.html"
+ create mode 100644 "\346\210\220\346\236\234\347\211\251/\350\276\262\346\245\255EC/preview_glb.html"
+fatal: could not read Username for 'https://github.com': Device not configured
+✅ 完了・GitHub push済み：/Users/sou/sen-board/logs/2026-06/2026-06-21_夜間リサーチ.md
+./scripts/night_research.sh: line 82: COACHING: command not found
+./scripts/night_research.sh: line 84: 管理画面: command not found
