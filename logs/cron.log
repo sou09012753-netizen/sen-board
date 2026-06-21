@@ -48,3 +48,7 @@ fatal: could not read Username for 'https://github.com': Device not configured
 ✅ 完了・GitHub push済み：/Users/sou/sen-board/logs/2026-06/2026-06-21_夜間リサーチ.md
 ./scripts/night_research.sh: line 82: COACHING: command not found
 ./scripts/night_research.sh: line 84: 管理画面: command not found
+[02:00] 1. SENアプリ 完了
+[02:01] 2. EC戦略 完了
+[02:02] 3. スケの営業進捗 完了
+[02:02] 4. チーム状況 完了
