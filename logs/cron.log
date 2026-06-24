@@ -52,3 +52,10 @@ fatal: could not read Username for 'https://github.com': Device not configured
 [02:01] 2. EC戦略 完了
 [02:02] 3. スケの営業進捗 完了
 [02:02] 4. チーム状況 完了
+[main 85c0c54] auto: 2026-06-22 夜間リサーチ
+ 3 files changed, 343 insertions(+)
+ create mode 100644 "logs/2026-06/2026-06-22_\345\244\234\351\226\223\343\203\252\343\202\265\343\203\274\343\203\201.md"
+fatal: could not read Username for 'https://github.com': Device not configured
+✅ 完了・GitHub push済み：/Users/sou/sen-board/logs/2026-06/2026-06-22_夜間リサーチ.md
+./scripts/night_research.sh: line 82: COACHING: command not found
+./scripts/night_research.sh: line 84: 管理画面: command not found

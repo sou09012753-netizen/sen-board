@@ -1311,3 +1311,10 @@ fatal: could not read Username for 'https://github.com': Device not configured
  4 files changed, 901 insertions(+), 344 deletions(-)
  create mode 100644 "logs/2026-06/2026-06-21_EC\346\210\246\347\225\245.md"
 fatal: could not read Username for 'https://github.com': Device not configured
+[22:00] 1. 農家を口説くロジック 完了
+[22:01] 2. 高単価・まとめ売り設計 完了
+[22:02] 3. 実行設計の穴（否定AI） 完了
+[22:02] 4. 農家との契約論点 完了
+[22:03] 5. 法務チェックリスト 完了
+[22:04] 6. 契約書の素案 完了
+✅ 全6本完了：/Users/sou/sen-board/logs/2026-06/2026-06-24_EC戦略.md
