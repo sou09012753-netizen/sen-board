@@ -87,3 +87,35 @@ To https://github.com/sou09012753-netizen/sen-board.git
 [02:01] 2. EC戦略 完了
 [02:02] 3. スケの営業進捗 完了
 [02:02] 4. チーム状況 完了
+[main 1b676c9] auto: 2026-06-27 夜間リサーチ
+ 3 files changed, 442 insertions(+)
+ create mode 100644 "logs/2026-06/2026-06-27_\345\244\234\351\226\223\343\203\252\343\202\265\343\203\274\343\203\201.md"
+To https://github.com/sou09012753-netizen/sen-board.git
+   f1ae409..1b676c9  main -> main
+✅ 完了・GitHub push済み：/Users/sou/sen-board/logs/2026-06/2026-06-27_夜間リサーチ.md
+/Users/sou/sen-board/scripts/night_research.sh: line 82: COACHING: command not found
+/Users/sou/sen-board/scripts/night_research.sh: line 84: 管理画面: command not found
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+[03:02] 1. SENアプリ 完了
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+[04:38] 2. EC戦略 完了
