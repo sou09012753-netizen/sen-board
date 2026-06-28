@@ -1426,3 +1426,10 @@ json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
  create mode 100644 "logs/2026-06/2026-06-28_\345\244\234\351\226\223\343\203\252\343\202\265\343\203\274\343\203\201.md"
 To https://github.com/sou09012753-netizen/sen-board.git
    1b676c9..62d64ed  main -> main
+[22:00] 1. 農家を口説くロジック 完了
+[22:01] 2. 高単価・まとめ売り設計 完了
+[22:02] 3. 実行設計の穴（否定AI） 完了
+[22:02] 4. 農家との契約論点 完了
+[22:03] 5. 法務チェックリスト 完了
+[22:04] 6. 契約書の素案 完了
+✅ 全6本完了：/Users/sou/sen-board/logs/2026-06/2026-06-28_EC戦略.md

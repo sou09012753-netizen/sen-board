@@ -143,3 +143,10 @@ Traceback (most recent call last):
     raise JSONDecodeError("Expecting value", s, err.value) from None
 json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
 [07:14] 4. チーム状況 完了
+[main 629ac0a] auto: 2026-06-28 夜間リサーチ
+ 3 files changed, 37 insertions(+)
+To https://github.com/sou09012753-netizen/sen-board.git
+   62d64ed..629ac0a  main -> main
+✅ 完了・GitHub push済み：/Users/sou/sen-board/logs/2026-06/2026-06-28_夜間リサーチ.md
+/Users/sou/sen-board/scripts/night_research.sh: line 82: COACHING: command not found
+/Users/sou/sen-board/scripts/night_research.sh: line 84: 管理画面: command not found
