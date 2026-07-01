@@ -33,45 +33,37 @@ ${AGENTS}
 
 甘い分析は禁止。否定AIに徹底的に穴を叩かせ、統合AIが対策まで出す。数字は調査して根拠を示す。"
 
-ask_claude() {
-  local prompt="$1"
-  local body
-  body=$(python3 -c "
-import json, sys
-prompt = sys.stdin.read()
-print(json.dumps({
-  'model': 'claude-sonnet-4-6',
-  'max_tokens': 2000,
-  'messages': [{'role': 'user', 'content': prompt}]
-}))
-" <<< "$prompt")
+SCRIPTS="$HOME/sen-board/scripts"
 
-  curl -s https://api.anthropic.com/v1/messages \
-    -H "x-api-key: $ANTHROPIC_API_KEY" \
-    -H "anthropic-version: 2023-06-01" \
-    -H "content-type: application/json" \
-    -d "$body" \
-    | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['content'][0]['text'] if 'content' in d else d.get('error',{}).get('message','APIエラー'))"
+ask_ai() {
+  local agent="$1"
+  local type="$2"
+  local prompt="$3"
+  local flags=""
+  [ -n "$agent" ] && flags="--agent $agent"
+  [ -n "$type"  ] && flags="$flags --type $type"
+  node "$SCRIPTS/ask.js" $flags <<< "$prompt"
 }
 
+# $1: セクションタイトル  $2: 論点  $3: agent（省略可）  $4: type（省略可）
 run() {
   echo "" >> "$OUTPUT"
   echo "---" >> "$OUTPUT"
   echo "## $1" >> "$OUTPUT"
   echo "" >> "$OUTPUT"
-  ask_claude "$BASE
+  ask_ai "${3:-}" "${4:-}" "$BASE
 
 【今回の論点】
 $2" >> "$OUTPUT"
   echo "[$(date +%H:%M)] $1 完了"
 }
 
-run "1. 農家を口説くロジック" "JAや市場出荷だと農家の手取りは販売価格の何割か調査せよ。その上で、このECなら手取りがどう変わるかを数字で示し、農家を口説くトーク・根拠・比較表を作れ。"
-run "2. 高単価・まとめ売り設計" "安売りしないための具体策。高単価・まとめ売り・質で勝負・想いを届ける設計。価格帯の目安、セット商品の組み方、想いの乗せ方を具体的に。"
-run "3. 実行設計の穴（否定AI）" "リール→EC→農家直送の実行で詰まる穴を全て洗い出せ。発送・送料負担・農家のキャパ・注文集中・クレーム対応・品質保証・取り分・購入導線の離脱。各穴に統合AIが対策を出す。"
-run "4. 農家との契約論点" "農家と交わす契約で詰めるべき論点。委託形態・取り分割合・発送責任・品質保証・クレーム時の責任分界・解約条件・専属性。論点ごとに推奨案を示せ。"
-run "5. 法務チェックリスト" "特定商取引法・食品表示法・景品表示法・その他関連法規で、このEC事業が確認すべき項目を全てリスト化。各項目で専門家(行政書士/弁護士)に確認すべき点を明記。"
-run "6. 契約書の素案" "農家との委託契約書の素案を作れ。冒頭に『これは叩き台であり、締結前に必ず専門家の確認が必要』と明記。実務で使う条項構成で。"
+run "1. 農家を口説くロジック" "JAや市場出荷だと農家の手取りは販売価格の何割か調査せよ。その上で、このECなら手取りがどう変わるかを数字で示し、農家を口説くトーク・根拠・比較表を作れ。" "農業" "research"
+run "2. 高単価・まとめ売り設計" "安売りしないための具体策。高単価・まとめ売り・質で勝負・想いを届ける設計。価格帯の目安、セット商品の組み方、想いの乗せ方を具体的に。" "農業" "decision"
+run "3. 実行設計の穴（否定AI）" "リール→EC→農家直送の実行で詰まる穴を全て洗い出せ。発送・送料負担・農家のキャパ・注文集中・クレーム対応・品質保証・取り分・購入導線の離脱。各穴に統合AIが対策を出す。" "農業" "decision"
+run "4. 農家との契約論点" "農家と交わす契約で詰めるべき論点。委託形態・取り分割合・発送責任・品質保証・クレーム時の責任分界・解約条件・専属性。論点ごとに推奨案を示せ。" "法務"
+run "5. 法務チェックリスト" "特定商取引法・食品表示法・景品表示法・その他関連法規で、このEC事業が確認すべき項目を全てリスト化。各項目で専門家(行政書士/弁護士)に確認すべき点を明記。" "法務"
+run "6. 契約書の素案" "農家との委託契約書の素案を作れ。冒頭に『これは叩き台であり、締結前に必ず専門家の確認が必要』と明記。実務で使う条項構成で。" "法務"
 
 echo "" >> "$OUTPUT"
 echo "---" >> "$OUTPUT"

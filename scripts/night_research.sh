@@ -32,46 +32,40 @@ ${CONTEXT}
 - SENアプリ：Vercel稼働中・クライアント検証フェーズ
 - EC事業：産直ドロップシッピング設計中・7月頭撮影ゴール"
 
-ask_claude() {
-  local prompt="$1"
-  local body
-  body=$(python3 -c "
-import json, sys
-prompt = sys.stdin.read()
-print(json.dumps({
-  'model': 'claude-sonnet-4-6',
-  'max_tokens': 2000,
-  'messages': [{'role': 'user', 'content': prompt}]
-}))
-" <<< "$prompt")
+SCRIPTS="$HOME/sen-board/scripts"
 
-  curl -s https://api.anthropic.com/v1/messages \
-    -H "x-api-key: $ANTHROPIC_API_KEY" \
-    -H "anthropic-version: 2023-06-01" \
-    -H "content-type: application/json" \
-    -d "$body" \
-    | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['content'][0]['text'] if 'content' in d else d.get('error',{}).get('message','APIエラー'))"
+# agent: エージェント名（省略可）
+# type:  タスク種別（省略可 → auto判定）
+ask_ai() {
+  local agent="$1"
+  local type="$2"
+  local prompt="$3"
+  local flags=""
+  [ -n "$agent" ] && flags="--agent $agent"
+  [ -n "$type"  ] && flags="$flags --type $type"
+  node "$SCRIPTS/ask.js" $flags <<< "$prompt"
 }
 
+# $1: セクションタイトル  $2: 論点  $3: agent（省略可）  $4: type（省略可）
 run() {
   echo "" >> "$OUTPUT"
   echo "---" >> "$OUTPUT"
   echo "## $1" >> "$OUTPUT"
   echo "" >> "$OUTPUT"
-  ask_claude "$BASE
+  ask_ai "${3:-}" "${4:-}" "$BASE
 
 【今回の論点】
 $2" >> "$OUTPUT"
   echo "[$(date +%H:%M)] $1 完了"
 }
 
-run "1. SENアプリ" "現在の完成度と次に実装すべき機能の優先順位。りくくん・さとな・まえはらのフィードバック取得状況。SESSION 0実装の是非。今週の一手。"
+run "1. SENアプリ" "現在の完成度と次に実装すべき機能の優先順位。りくくん・さとな・まえはらのフィードバック取得状況。SESSION 0実装の是非。今週の一手。" "プロダクト"
 
-run "2. EC戦略" "産直ドロップシッピングECの進捗確認。さとなのテンプレート記入状況。農家を口説くロジックの精度。7月撮影までの残タスク。今週の一手。"
+run "2. EC戦略" "産直ドロップシッピングECの進捗確認。さとなのテンプレート記入状況。農家を口説くロジックの精度。7月撮影までの残タスク。今週の一手。" "農業"
 
-run "3. スケの営業進捗" "今月10件目標に対するパイプライン状況。2回目クロージング対象の状況。DM数・商談数の進捗。詰まってる箇所と対策。今週の一手。"
+run "3. スケの営業進捗" "今月10件目標に対するパイプライン状況。2回目クロージング対象の状況。DM数・商談数の進捗。詰まってる箇所と対策。今週の一手。" "営業"
 
-run "4. チーム状況" "さとな・なのか・スケそれぞれの動き・リスク・次の関与タイミング。仙石が今週やるべき承認・判断はあるか。チームへの一手。"
+run "4. チーム状況" "さとな・なのか・スケそれぞれの動き・リスク・次の関与タイミング。仙石が今週やるべき承認・判断はあるか。チームへの一手。" "人材"
 
 echo "" >> "$OUTPUT"
 echo "---" >> "$OUTPUT"
