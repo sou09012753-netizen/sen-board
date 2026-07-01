@@ -1,2 +1,4 @@
 {"ts":"2026-07-01T04:05:39.861Z","model":"gemini-2.5-flash","useSearch":true,"calls_today":1,"prompt_len":46750,"resp_len":540}
 {"ts":"2026-07-01T04:09:25.636Z","model":"gemini-2.5-flash","useSearch":true,"calls_today":2,"prompt_len":46750,"resp_len":1185}
+{"ts":"2026-07-01T04:48:03.497Z","model":"gemini-2.5-flash","useSearch":true,"calls_today":3,"prompt_len":97,"resp_len":1082}
+{"ts":"2026-07-01T13:01:37.505Z","model":"gemini-2.5-flash","useSearch":true,"calls_today":4,"prompt_len":47332,"resp_len":1000}
